@@ -1,0 +1,250 @@
+/* Scanner Explainer Styles */
+
+.scanner-explainer {
+  width: 100%;
+  margin: 20px 0;
+}
+
+.explainer-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.explainer-header {
+  padding: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.explainer-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.explainer-description {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Sections */
+.explainer-section {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.explainer-section:last-of-type {
+  border-bottom: none;
+}
+
+.explainer-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Features List */
+.features-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+}
+
+.features-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.feature-icon {
+  color: #10b981;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Detects Grid */
+.detects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.threat-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #991b1b;
+}
+
+.threat-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Use Case */
+.use-case {
+  background: #f0fdf4;
+  border-left: 4px solid #10b981;
+}
+
+.use-case p {
+  margin: 0;
+  font-size: 14px;
+  color: #065f46;
+  line-height: 1.6;
+}
+
+/* AI Explanation */
+.ai-explanation {
+  background: #f3f4f6;
+  border-left: 4px solid #667eea;
+}
+
+.explanation-content {
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.explanation-content p {
+  margin: 0;
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.6;
+}
+
+/* Error Message */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 13px;
+  border-top: 1px solid #fecaca;
+}
+
+.error-message span {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* Button */
+.btn-get-explanation {
+  width: calc(100% - 48px);
+  margin: 20px 24px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-get-explanation:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-get-explanation:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .explainer-header {
+    padding: 16px;
+  }
+
+  .explainer-header h2 {
+    font-size: 18px;
+  }
+
+  .explainer-section {
+    padding: 16px;
+  }
+
+  .features-list {
+    grid-template-columns: 1fr;
+  }
+
+  .detects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .btn-get-explanation {
+    width: calc(100% - 32px);
+    margin: 16px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .explainer-header {
+    padding: 12px;
+  }
+
+  .explainer-header h2 {
+    font-size: 16px;
+  }
+
+  .explainer-section {
+    padding: 12px;
+  }
+
+  .explainer-section h3 {
+    font-size: 14px;
+  }
+
+  .features-list li,
+  .threat-badge {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .detects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-get-explanation {
+    width: calc(100% - 24px);
+    margin: 12px 12px;
+    font-size: 13px;
+  }
+}

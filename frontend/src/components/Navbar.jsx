@@ -34,6 +34,7 @@ export default function Navbar() {
           <Link to="/monitor" className={`nav-link ${isActive('/monitor') ? 'active' : ''}`}>Monitor</Link>
           <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}>Dashboard</Link>
           <Link to="/history" className={`nav-link ${isActive('/history') ? 'active' : ''}`}>History</Link>
+          <Link to="/scanner-guide" className={`nav-link ${isActive('/scanner-guide') ? 'active' : ''}`}>Guide</Link>
         </div>
 
         {/* Auth */}
@@ -74,6 +75,7 @@ export default function Navbar() {
         <Link to="/monitor" className="mobile-link" onClick={() => setMenuOpen(false)}>👁️ Monitor</Link>
         <Link to="/dashboard" className="mobile-link" onClick={() => setMenuOpen(false)}>📊 Dashboard</Link>
         <Link to="/history" className="mobile-link" onClick={() => setMenuOpen(false)}>📁 History</Link>
+        <Link to="/scanner-guide" className="mobile-link" onClick={() => setMenuOpen(false)}>📚 Guide</Link>
         {user ? (
           <>
             <span className="mobile-user">👤 {user.username}</span>
