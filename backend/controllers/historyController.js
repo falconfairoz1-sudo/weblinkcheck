@@ -90,7 +90,7 @@ async function deleteScan(req, res, next) {
 }
 
 /**
- * DELETE /api/history
+ * DELETE /api/history/clear
  * Clear all history for the authenticated user
  */
 async function clearHistory(req, res, next) {
