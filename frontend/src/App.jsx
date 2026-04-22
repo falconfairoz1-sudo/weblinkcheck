@@ -11,6 +11,7 @@ import Register from './pages/Register';
 import ScanDetail from './pages/ScanDetail';
 import Monitor from './pages/Monitor';
 import QRScanner from './pages/QRScanner';
+import ContentScan from './pages/ContentScan';
 
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
               <Route path="/scan/:id" element={<ScanDetail />} />
               <Route path="/monitor" element={<Monitor />} />
               <Route path="/qr-scanner" element={<QRScanner />} />
+              <Route path="/content-scan" element={<ContentScan />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />      
             </Routes>

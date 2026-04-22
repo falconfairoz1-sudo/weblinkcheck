@@ -29,6 +29,7 @@ export default function Navbar() {
         {/* Desktop Nav */}
         <div className="navbar-links">
           <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>Scanner</Link>
+          <Link to="/content-scan" className={`nav-link ${isActive('/content-scan') ? 'active' : ''}`}>Content Scanner</Link>
           <Link to="/qr-scanner" className={`nav-link ${isActive('/qr-scanner') ? 'active' : ''}`}>QR Scanner</Link>
           <Link to="/monitor" className={`nav-link ${isActive('/monitor') ? 'active' : ''}`}>Monitor</Link>
           <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}>Dashboard</Link>
@@ -68,6 +69,7 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
         <Link to="/" className="mobile-link" onClick={() => setMenuOpen(false)}>🔍 Scanner</Link>
+        <Link to="/content-scan" className="mobile-link" onClick={() => setMenuOpen(false)}>🔍 Content Scanner</Link>
         <Link to="/qr-scanner" className="mobile-link" onClick={() => setMenuOpen(false)}>📷 QR Scanner</Link>
         <Link to="/monitor" className="mobile-link" onClick={() => setMenuOpen(false)}>👁️ Monitor</Link>
         <Link to="/dashboard" className="mobile-link" onClick={() => setMenuOpen(false)}>📊 Dashboard</Link>

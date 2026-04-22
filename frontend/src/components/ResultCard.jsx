@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getStatusColor, getStatusIcon, getStatusLabel, getRiskColor, getSeverityColor, formatDate, truncateUrl } from '../utils/helpers';
 import RiskGauge from './RiskGauge';
-import LinkPreview from './LinkPreview';
 import '../styles/resultcard.css';
 
 export default function ResultCard({ result }) {
@@ -49,16 +48,6 @@ export default function ResultCard({ result }) {
           {truncateUrl(url, 80)}
         </a>
       </div>
-
-      {/* Smart Link Preview */}
-      <LinkPreview 
-        url={url} 
-        status={status} 
-        riskScore={riskScore}
-        metadata={{
-          threats: warnings?.map(w => w.type) || []
-        }}
-      />
 
       {/* Risk Gauge */}
       <div className="risk-section">
