@@ -8,8 +8,8 @@ exports.generatePDFReport = async (req, res) => {
   try {
     const scan = await Scan.findOne({
       _id: req.params.id,
-      user: req.user.id
-    }).populate('user', 'name email');
+      userId: req.user._id
+    });
 
     if (!scan) {
       return res.status(404).json({ error: 'Scan not found' });
@@ -36,7 +36,7 @@ exports.generatePDFReport = async (req, res) => {
     doc.moveDown(0.5);
     doc.fontSize(11).fillColor('#333').text(`URL: ${scan.url}`);
     doc.text(`Scanned: ${scan.createdAt.toLocaleString()}`);
-    doc.text(`Scan Type: ${scan.scanType || 'standard'}`);
+    doc.text(`Domain: ${scan.domain || 'N/A'}`);
     doc.moveDown();
 
     // Risk Score
@@ -49,27 +49,28 @@ exports.generatePDFReport = async (req, res) => {
     doc.moveDown();
 
     // Heuristic Analysis
-    if (scan.results?.heuristicAnalysis) {
+    if (scan.heuristics) {
       doc.fontSize(16).fillColor('#000').text('Heuristic Analysis', { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(11).fillColor('#333');
       
-      const heuristics = scan.results.heuristicAnalysis;
-      doc.text(`• URL Length: ${heuristics.urlLength || 'N/A'}`);
+      const heuristics = scan.heuristics;
       doc.text(`• Has HTTPS: ${heuristics.hasHttps ? 'Yes' : 'No'}`);
       doc.text(`• Is Shortened: ${heuristics.isShortened ? 'Yes' : 'No'}`);
       doc.text(`• Suspicious Keywords: ${heuristics.hasSuspiciousKeywords ? 'Detected' : 'None'}`);
       doc.text(`• IP-based URL: ${heuristics.isIpBased ? 'Yes' : 'No'}`);
+      doc.text(`• Domain Length: ${heuristics.domainLength || 'N/A'}`);
+      doc.text(`• TLD: ${heuristics.tld || 'N/A'}`);
       doc.moveDown();
     }
 
     // Google Safe Browsing
-    if (scan.results?.googleSafeBrowsing) {
+    if (scan.googleSafeBrowsing) {
       doc.fontSize(16).fillColor('#000').text('Google Safe Browsing', { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(11).fillColor('#333');
       
-      const google = scan.results.googleSafeBrowsing;
+      const google = scan.googleSafeBrowsing;
       doc.text(`Status: ${google.isSafe ? 'Safe' : 'Threat Detected'}`);
       if (google.threats && google.threats.length > 0) {
         doc.text(`Threats: ${google.threats.join(', ')}`);
@@ -78,12 +79,12 @@ exports.generatePDFReport = async (req, res) => {
     }
 
     // VirusTotal
-    if (scan.results?.virusTotal) {
+    if (scan.virusTotal) {
       doc.fontSize(16).fillColor('#000').text('VirusTotal Analysis', { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(11).fillColor('#333');
       
-      const vt = scan.results.virusTotal;
+      const vt = scan.virusTotal;
       doc.text(`Detections: ${vt.positives || 0}/${vt.total || 0} engines`);
       if (vt.positives > 0) {
         doc.fillColor('#ef4444').text(`⚠️ ${vt.positives} security vendors flagged this URL as malicious`);
@@ -92,14 +93,29 @@ exports.generatePDFReport = async (req, res) => {
     }
 
     // Warnings
-    if (scan.results?.heuristicAnalysis?.warnings?.length > 0) {
+    if (scan.warnings && scan.warnings.length > 0) {
       doc.fontSize(16).fillColor('#000').text('Security Warnings', { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(11).fillColor('#ef4444');
       
-      scan.results.heuristicAnalysis.warnings.forEach(warning => {
-        doc.text(`⚠️ ${warning}`);
+      scan.warnings.forEach(warning => {
+        doc.text(`⚠️ ${warning.message || warning}`);
       });
+      doc.moveDown();
+    }
+
+    // AI Analysis
+    if (scan.aiAnalysis) {
+      doc.fontSize(16).fillColor('#000').text('AI Analysis', { underline: true });
+      doc.moveDown(0.5);
+      doc.fontSize(11).fillColor('#333');
+      
+      const ai = scan.aiAnalysis;
+      doc.text(`Phishing Probability: ${ai.phishingProbability || 0}%`);
+      doc.text(`Confidence: ${ai.confidence || 'N/A'}`);
+      if (ai.explanation && ai.explanation.length > 0) {
+        doc.text(`Analysis: ${ai.explanation.join('. ')}`);
+      }
       doc.moveDown();
     }
 
@@ -121,16 +137,156 @@ exports.generatePDFReport = async (req, res) => {
 };
 
 /**
- * Generate CSV export of scan history
+ * Generate PDF export of scan history
+ */
+exports.generatePDFHistoryReport = async (req, res) => {
+  try {
+    const scans = await Scan.find({ userId: req.user._id })
+      .sort({ createdAt: -1 })
+      .limit(500); // Limit to prevent huge PDFs
+
+    if (scans.length === 0) {
+      return res.status(404).json({ error: 'No scan history found' });
+    }
+
+    // Create PDF document
+    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+
+    // Set response headers
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=linkguard-scan-history-${new Date().toISOString().split('T')[0]}.pdf`);
+
+    // Pipe PDF to response
+    doc.pipe(res);
+
+    // Header
+    doc.fontSize(24).fillColor('#3b82f6').text('LinkGuard Scan History Report', { align: 'center' });
+    doc.moveDown();
+    doc.fontSize(12).fillColor('#666').text(`Generated: ${new Date().toLocaleString()}`, { align: 'center' });
+    doc.fontSize(10).fillColor('#666').text(`Total Scans: ${scans.length}`, { align: 'center' });
+    doc.moveDown(2);
+
+    // Summary Statistics
+    const safeCount = scans.filter(s => s.status === 'safe').length;
+    const suspiciousCount = scans.filter(s => s.status === 'suspicious').length;
+    const maliciousCount = scans.filter(s => s.status === 'malicious').length;
+    const avgRiskScore = Math.round(scans.reduce((sum, s) => sum + (s.riskScore || 0), 0) / scans.length);
+
+    doc.fontSize(16).fillColor('#000').text('Summary Statistics', { underline: true });
+    doc.moveDown(0.5);
+    doc.fontSize(11).fillColor('#333');
+    doc.text(`• Total Scans: ${scans.length}`);
+    doc.fillColor('#10b981').text(`• Safe URLs: ${safeCount} (${Math.round(safeCount/scans.length*100)}%)`);
+    doc.fillColor('#f59e0b').text(`• Suspicious URLs: ${suspiciousCount} (${Math.round(suspiciousCount/scans.length*100)}%)`);
+    doc.fillColor('#ef4444').text(`• Malicious URLs: ${maliciousCount} (${Math.round(maliciousCount/scans.length*100)}%)`);
+    doc.fillColor('#333').text(`• Average Risk Score: ${avgRiskScore}/100`);
+    doc.moveDown(2);
+
+    // Scan History Table Header
+    doc.fontSize(16).fillColor('#000').text('Detailed Scan History', { underline: true });
+    doc.moveDown(1);
+
+    // Table setup
+    const tableTop = doc.y;
+    const itemHeight = 20;
+    let currentY = tableTop;
+
+    // Table headers
+    doc.fontSize(9).fillColor('#666');
+    doc.text('Date', 50, currentY, { width: 80 });
+    doc.text('URL', 130, currentY, { width: 200 });
+    doc.text('Status', 330, currentY, { width: 60 });
+    doc.text('Risk', 390, currentY, { width: 40 });
+    doc.text('Threats', 430, currentY, { width: 100 });
+
+    // Draw header line
+    currentY += 15;
+    doc.moveTo(50, currentY).lineTo(530, currentY).stroke();
+    currentY += 10;
+
+    // Table rows
+    scans.forEach((scan, index) => {
+      // Check if we need a new page
+      if (currentY > doc.page.height - 100) {
+        doc.addPage();
+        currentY = 50;
+        
+        // Redraw headers on new page
+        doc.fontSize(9).fillColor('#666');
+        doc.text('Date', 50, currentY, { width: 80 });
+        doc.text('URL', 130, currentY, { width: 200 });
+        doc.text('Status', 330, currentY, { width: 60 });
+        doc.text('Risk', 390, currentY, { width: 40 });
+        doc.text('Threats', 430, currentY, { width: 100 });
+        currentY += 15;
+        doc.moveTo(50, currentY).lineTo(530, currentY).stroke();
+        currentY += 10;
+      }
+
+      // Row data
+      const date = scan.createdAt.toLocaleDateString();
+      const url = scan.url.length > 35 ? scan.url.substring(0, 32) + '...' : scan.url;
+      const status = scan.status.toUpperCase();
+      const riskScore = scan.riskScore || 0;
+      
+      // Determine threats
+      let threats = [];
+      if (scan.googleSafeBrowsing && !scan.googleSafeBrowsing.isSafe) {
+        threats.push('Google');
+      }
+      if (scan.virusTotal && scan.virusTotal.positives > 0) {
+        threats.push(`VT:${scan.virusTotal.positives}`);
+      }
+      const threatText = threats.length > 0 ? threats.join(', ') : 'None';
+
+      // Set row color based on status
+      const statusColor = scan.status === 'safe' ? '#10b981' : 
+                         scan.status === 'suspicious' ? '#f59e0b' : '#ef4444';
+
+      doc.fontSize(8).fillColor('#333');
+      doc.text(date, 50, currentY, { width: 80 });
+      doc.text(url, 130, currentY, { width: 200 });
+      doc.fillColor(statusColor).text(status, 330, currentY, { width: 60 });
+      doc.fillColor('#333').text(riskScore.toString(), 390, currentY, { width: 40 });
+      doc.text(threatText, 430, currentY, { width: 100 });
+
+      currentY += itemHeight;
+
+      // Draw separator line every 5 rows
+      if ((index + 1) % 5 === 0) {
+        doc.moveTo(50, currentY - 5).lineTo(530, currentY - 5).strokeColor('#eee').stroke();
+      }
+    });
+
+    // Footer
+    const footerY = doc.page.height - 50;
+    doc.fontSize(8).fillColor('#999').text(
+      'This report contains your LinkGuard scan history. Keep this document secure as it may contain sensitive URL information. ' +
+      'Generated by LinkGuard AI-Powered Link Safety Checker.',
+      50,
+      footerY,
+      { align: 'center', width: doc.page.width - 100 }
+    );
+
+    // Finalize PDF
+    doc.end();
+  } catch (error) {
+    console.error('PDF history generation error:', error);
+    res.status(500).json({ error: 'Failed to generate PDF history report' });
+  }
+};
+
+/**
+ * Generate CSV export of scan history (keeping for backward compatibility)
  */
 exports.generateCSVReport = async (req, res) => {
   try {
-    const scans = await Scan.find({ user: req.user.id })
+    const scans = await Scan.find({ userId: req.user._id })
       .sort({ createdAt: -1 })
       .limit(1000);
 
     // CSV headers
-    let csv = 'Date,URL,Status,Risk Score,Scan Type,Google Safe Browsing,VirusTotal Detections\n';
+    let csv = 'Date,URL,Status,Risk Score,Google Safe Browsing,VirusTotal Detections\n';
 
     // CSV rows
     scans.forEach(scan => {
@@ -138,11 +294,10 @@ exports.generateCSVReport = async (req, res) => {
       const url = `"${scan.url.replace(/"/g, '""')}"`;
       const status = scan.status;
       const riskScore = scan.riskScore;
-      const scanType = scan.scanType || 'standard';
-      const googleSafe = scan.results?.googleSafeBrowsing?.isSafe ? 'Safe' : 'Threat';
-      const vtDetections = scan.results?.virusTotal?.positives || 0;
+      const googleSafe = scan.googleSafeBrowsing?.isSafe ? 'Safe' : 'Threat';
+      const vtDetections = scan.virusTotal?.positives || 0;
 
-      csv += `${date},${url},${status},${riskScore},${scanType},${googleSafe},${vtDetections}\n`;
+      csv += `${date},${url},${status},${riskScore},${googleSafe},${vtDetections}\n`;
     });
 
     res.setHeader('Content-Type', 'text/csv');

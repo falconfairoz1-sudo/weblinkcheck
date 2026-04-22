@@ -82,25 +82,27 @@ export default function History() {
           {user && scans.length > 0 && (
             <>
               <button 
-                className="btn-export-csv"
+                className="btn-export-pdf"
                 onClick={async () => {
                   try {
-                    const response = await api.get('/report/csv', {
+                    const response = await api.get('/report/pdf-history', {
                       responseType: 'blob'
                     });
-                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
                     const link = document.createElement('a');
                     link.href = url;
-                    link.setAttribute('download', 'linkguard-scan-history.csv');
+                    link.setAttribute('download', `linkguard-scan-history-${new Date().toISOString().split('T')[0]}.pdf`);
                     document.body.appendChild(link);
                     link.click();
                     link.remove();
+                    window.URL.revokeObjectURL(url);
                   } catch (err) {
-                    alert('Failed to export CSV');
+                    console.error('PDF export error:', err);
+                    alert('Failed to export PDF: ' + (err.response?.data?.error || err.message));
                   }
                 }}
               >
-                📊 Export CSV
+                📄 Download PDF
               </button>
               <button className="btn-clear-history" onClick={handleClearAll}>
                 🗑️ Clear All

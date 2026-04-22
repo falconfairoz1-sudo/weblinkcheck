@@ -30,7 +30,7 @@
   gap: var(--space-md);
 }
 
-.btn-export-csv {
+.btn-export-pdf {
   background: var(--gradient-primary);
   color: white;
   border: none;
@@ -45,7 +45,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-.btn-export-csv:hover {
+.btn-export-pdf:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
