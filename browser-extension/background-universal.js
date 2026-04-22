@@ -84,6 +84,19 @@
         async handleScanUrl(url, sendResponse) {
             try {
                 console.log('Scanning URL:', url);
+                
+                // Check if user is authenticated
+                const settings = await this.getSettings();
+                if (!settings.authToken) {
+                    sendResponse({
+                        error: true,
+                        message: 'Authentication required',
+                        requiresAuth: true,
+                        url: url
+                    });
+                    return;
+                }
+                
                 const result = await this.scanUrl(url);
                 console.log('Scan result:', result);
                 sendResponse(result);
@@ -175,17 +188,35 @@
             const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
             try {
+                // Get user token
+                const settings = await this.getSettings();
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                };
+
+                if (settings.authToken) {
+                    headers['Authorization'] = `Bearer ${settings.authToken}`;
+                }
+
                 const response = await fetch(`${apiUrl}/scan`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
+                    headers,
                     body: JSON.stringify({ url }),
                     signal: controller.signal
                 });
 
                 clearTimeout(timeoutId);
+
+                if (response.status === 401) {
+                    // Token expired or invalid - clear auth
+                    await this.updateSettings({
+                        ...settings,
+                        authToken: null,
+                        currentUser: null
+                    });
+                    throw new Error('Authentication required. Please login again.');
+                }
 
                 if (!response.ok) {
                     throw new Error(`API request failed: ${response.status} ${response.statusText}`);
@@ -348,7 +379,9 @@
                     enabled: true,
                     showNotifications: true,
                     blockDangerous: false,
-                    apiUrl: this.apiUrl
+                    apiUrl: this.apiUrl,
+                    authToken: null,
+                    currentUser: null
                 };
 
                 if (browserAPI.storage && browserAPI.storage.sync) {

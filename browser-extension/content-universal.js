@@ -37,9 +37,14 @@
                 // Load settings
                 await this.loadSettings();
                 
-                // Only proceed if protection is enabled
+                // Only proceed if protection is enabled and user is authenticated
                 if (!this.settings.enabled) {
                     console.log('LinkGuard protection is disabled');
+                    return;
+                }
+
+                if (!this.settings.authToken) {
+                    console.log('LinkGuard: User not authenticated, skipping link scanning');
                     return;
                 }
 
@@ -66,16 +71,31 @@
                 if (browserAPI && browserAPI.runtime) {
                     this.settings = await new Promise((resolve) => {
                         browserAPI.runtime.sendMessage({ action: 'getSettings' }, (response) => {
-                            resolve(response || { enabled: true, showNotifications: true });
+                            resolve(response || { 
+                                enabled: true, 
+                                showNotifications: true,
+                                authToken: null,
+                                currentUser: null
+                            });
                         });
                     });
                 } else {
                     // Fallback settings
-                    this.settings = { enabled: true, showNotifications: true };
+                    this.settings = { 
+                        enabled: true, 
+                        showNotifications: true,
+                        authToken: null,
+                        currentUser: null
+                    };
                 }
             } catch (error) {
                 console.error('Error loading settings:', error);
-                this.settings = { enabled: true, showNotifications: true };
+                this.settings = { 
+                    enabled: true, 
+                    showNotifications: true,
+                    authToken: null,
+                    currentUser: null
+                };
             }
         }
 

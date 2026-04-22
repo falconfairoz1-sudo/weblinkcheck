@@ -250,11 +250,11 @@
             <div class="page-url" id="currentUrl">Loading...</div>
             <div class="page-status unknown" id="pageStatus">
                 <span id="statusIcon">🔄</span>
-                <span id="statusText">Analyzing...</span>
+                <span id="statusText">Checking authentication...</span>
             </div>
         </div>
 
-        <div class="actions">
+        <div class="actions" id="authenticatedActions">
             <button class="btn btn-primary" id="scanBtn">
                 <span id="scanIcon">🔍</span>
                 <span id="scanText">Scan This Page</span>
@@ -263,6 +263,18 @@
             <button class="btn btn-secondary" id="openScannerBtn">
                 <span>🚀</span>
                 Open Full Scanner
+            </button>
+        </div>
+
+        <div class="actions hidden" id="unauthenticatedActions">
+            <button class="btn btn-primary" id="loginBtn">
+                <span>🔐</span>
+                Login Required
+            </button>
+            
+            <button class="btn btn-secondary" id="openAuthBtn">
+                <span>📝</span>
+                Register Account
             </button>
         </div>
 
@@ -359,7 +371,9 @@
                                 resolve(response || {
                                     enabled: true,
                                     showNotifications: true,
-                                    blockDangerous: false
+                                    blockDangerous: false,
+                                    authToken: null,
+                                    currentUser: null
                                 });
                             });
                         });
@@ -367,7 +381,9 @@
                         this.settings = {
                             enabled: true,
                             showNotifications: true,
-                            blockDangerous: false
+                            blockDangerous: false,
+                            authToken: null,
+                            currentUser: null
                         };
                     }
                 } catch (error) {
@@ -375,7 +391,9 @@
                     this.settings = {
                         enabled: true,
                         showNotifications: true,
-                        blockDangerous: false
+                        blockDangerous: false,
+                        authToken: null,
+                        currentUser: null
                     };
                 }
             }
@@ -393,6 +411,20 @@
                     }
                 } else {
                     urlElement.textContent = 'No active tab';
+                }
+
+                // Check authentication status
+                if (this.settings.authToken && this.settings.currentUser) {
+                    // User is authenticated
+                    document.getElementById('authenticatedActions').classList.remove('hidden');
+                    document.getElementById('unauthenticatedActions').classList.add('hidden');
+                    document.getElementById('extensionStatus').textContent = `Logged in as ${this.settings.currentUser.username}`;
+                } else {
+                    // User is not authenticated
+                    document.getElementById('authenticatedActions').classList.add('hidden');
+                    document.getElementById('unauthenticatedActions').classList.remove('hidden');
+                    document.getElementById('extensionStatus').textContent = 'Authentication required';
+                    this.updatePageStatus('unknown', '🔐', 'Login required to scan');
                 }
 
                 // Update settings toggles
@@ -420,6 +452,16 @@
 
                 // Open scanner button
                 document.getElementById('openScannerBtn').addEventListener('click', () => {
+                    this.openFullScanner();
+                });
+
+                // Login button (for unauthenticated users)
+                document.getElementById('loginBtn').addEventListener('click', () => {
+                    this.openFullScanner();
+                });
+
+                // Register button (for unauthenticated users)
+                document.getElementById('openAuthBtn').addEventListener('click', () => {
                     this.openFullScanner();
                 });
 
@@ -452,6 +494,12 @@
             async scanCurrentPage() {
                 if (!this.currentTab || !this.currentTab.url) {
                     this.updatePageStatus('unknown', '❓', 'No page to scan');
+                    return;
+                }
+
+                // Check authentication first
+                if (!this.settings.authToken) {
+                    this.updatePageStatus('unknown', '🔐', 'Login required to scan');
                     return;
                 }
 
@@ -488,6 +536,12 @@
                     } else {
                         // Fallback: direct API call or mock analysis
                         result = await this.mockScan(this.currentTab.url);
+                    }
+
+                    // Check if authentication is required
+                    if (result && result.requiresAuth) {
+                        this.updatePageStatus('unknown', '🔐', 'Authentication required');
+                        return;
                     }
 
                     // Update UI with results
