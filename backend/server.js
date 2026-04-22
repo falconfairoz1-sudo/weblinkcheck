@@ -57,6 +57,8 @@ app.use(morgan('dev'));
 app.use('/api/scan', scanLimiter, scanRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/history', historyRoutes);
+app.use('/api/youtube', require('./routes/youtube'));
+
 
 app.get('/api/health', (req, res) => {
   res.json({
