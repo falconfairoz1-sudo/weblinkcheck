@@ -1,0 +1,44 @@
+{
+  "name": "linkguard-ai-link-safety-checker",
+  "version": "1.0.0",
+  "description": "AI-Powered Link Safety Checker - Full-stack web application for detecting phishing, malware, and malicious URLs",
+  "main": "index.js",
+  "scripts": {
+    "setup": "node setup.js",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "test:apis": "cd backend && node test-apis.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cybersecurity",
+    "phishing-detection",
+    "url-scanner",
+    "malware-detection",
+    "ai-security",
+    "threat-intelligence",
+    "link-safety",
+    "security-analysis"
+  ],
+  "author": "LinkGuard Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/linkguard-ai-link-safety-checker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/linkguard-ai-link-safety-checker/issues"
+  },
+  "homepage": "https://github.com/your-username/linkguard-ai-link-safety-checker#readme"
+}
