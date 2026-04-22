@@ -9,6 +9,8 @@ import History from './pages/History';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ScanDetail from './pages/ScanDetail';
+import Monitor from './pages/Monitor';
+import QRScanner from './pages/QRScanner';
 
 
 export default function App() {
@@ -23,6 +25,8 @@ export default function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/history" element={<History />} />
               <Route path="/scan/:id" element={<ScanDetail />} />
+              <Route path="/monitor" element={<Monitor />} />
+              <Route path="/qr-scanner" element={<QRScanner />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />      
             </Routes>

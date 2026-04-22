@@ -10,7 +10,11 @@ const rateLimit = require('express-rate-limit');
 const scanRoutes = require('./routes/scanRoutes');
 const authRoutes = require('./routes/authRoutes');
 const historyRoutes = require('./routes/historyRoutes');
+const qrRoutes = require('./routes/qrRoutes');
+const monitorRoutes = require('./routes/monitorRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
+const { startMonitorCron } = require('./jobs/monitorCron');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -57,6 +61,9 @@ app.use(morgan('dev'));
 app.use('/api/scan', scanLimiter, scanRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/history', historyRoutes);
+app.use('/api/qr', qrRoutes);
+app.use('/api/monitor', monitorRoutes);
+app.use('/api/report', reportRoutes);
 
 
 
@@ -81,6 +88,10 @@ mongoose
   .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/link_safety_checker')
   .then(() => {
     console.log('✅ MongoDB connected');
+    
+    // Start monitor cron job
+    startMonitorCron();
+    
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
     });

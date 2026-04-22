@@ -3,6 +3,7 @@ const NodeCache = require('node-cache');
 const Scan = require('../models/Scan');
 const { checkGoogleSafeBrowsing } = require('../services/googleSafeBrowsing');
 const { checkVirusTotal } = require('../services/virusTotal');
+const { sendHighRiskAlert } = require('../services/emailService');
 const {
   analyzeUrlHeuristics,
   generateWarnings,
@@ -120,6 +121,13 @@ async function scanUrl(req, res, next) {
       });
       await scan.save();
       scanResult.scanId = scan._id;
+
+      // Send high-risk alert email if authenticated and score is high
+      if (req.user && score >= 70) {
+        sendHighRiskAlert(req.user, scan).catch(err => 
+          console.error('High-risk alert email error:', err)
+        );
+      }
     } catch (dbError) {
       console.error('DB save error:', dbError.message);
       // Don't fail the request if DB save fails

@@ -78,11 +78,36 @@ export default function History() {
             {user ? 'Your personal scan history' : 'Recent public scans'}
           </p>
         </div>
-        {user && scans.length > 0 && (
-          <button className="btn-clear-history" onClick={handleClearAll}>
-            🗑️ Clear All
-          </button>
-        )}
+        <div className="history-actions">
+          {user && scans.length > 0 && (
+            <>
+              <button 
+                className="btn-export-csv"
+                onClick={async () => {
+                  try {
+                    const response = await api.get('/report/csv', {
+                      responseType: 'blob'
+                    });
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', 'linkguard-scan-history.csv');
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                  } catch (err) {
+                    alert('Failed to export CSV');
+                  }
+                }}
+              >
+                📊 Export CSV
+              </button>
+              <button className="btn-clear-history" onClick={handleClearAll}>
+                🗑️ Clear All
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Filters */}

@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
+const { sendWelcomeEmail } = require('../services/emailService');
 
 const signToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET || 'fallback_secret', {
@@ -28,6 +29,9 @@ async function register(req, res, next) {
 
     const user = await User.create({ username, email, password });
     const token = signToken(user._id);
+
+    // Send welcome email (non-blocking)
+    sendWelcomeEmail(user).catch(err => console.error('Welcome email error:', err));
 
     res.status(201).json({
       message: 'Account created successfully',
