@@ -2,8 +2,6 @@
 
 A comprehensive full-stack web application that analyzes URLs and determines whether they are safe, suspicious, or malicious using multi-layer security analysis and AI-powered threat detection.
 
-![LinkGuard Demo](https://via.placeholder.com/800x400/0a0a0b/3b82f6?text=LinkGuard+Demo)
-
 ## 🔷 Core Features
 
 ### 🛡️ Dual-Layer Security Analysis
@@ -11,13 +9,10 @@ A comprehensive full-stack web application that analyzes URLs and determines whe
 - **VirusTotal API** - Comprehensive malware scanning
 - **AI Heuristics** - Custom pattern recognition and risk scoring
 
-*Note: PhishTank and WHOIS APIs removed for simplicity while maintaining comprehensive threat detection.*
-
 ### 🔍 Advanced URL Analysis
 - URL shortener detection (bit.ly, tinyurl, etc.)
 - Suspicious keyword identification
 - IP-based URL detection
-- Domain age verification
 - SSL certificate validation
 - Subdomain abuse detection
 
@@ -90,25 +85,19 @@ A comprehensive full-stack web application that analyzes URLs and determines whe
 ### 1. Clone Repository
 ```bash
 git clone <repository-url>
-cd link-safety-checker
+cd linkguard
 ```
 
-### 2. Backend Setup
+### 2. Install Dependencies
+```bash
+npm run install:all
+```
+
+### 3. Backend Setup
 ```bash
 cd backend
-npm install
-
-# Copy environment template
 cp .env.example .env
-
 # Edit .env with your configuration
-nano .env
-```
-
-### 3. Frontend Setup
-```bash
-cd ../frontend
-npm install
 ```
 
 ### 4. Environment Configuration
@@ -131,17 +120,9 @@ GOOGLE_SAFE_BROWSING_API_KEY=your_google_api_key
 VIRUSTOTAL_API_KEY=your_virustotal_api_key
 ```
 
-### 5. Start Development Servers
-
-**Backend:**
+### 5. Start Development
 ```bash
-cd backend
-npm run dev
-```
-
-**Frontend:**
-```bash
-cd frontend
+# Start both frontend and backend
 npm run dev
 ```
 
@@ -183,7 +164,6 @@ Visit `http://localhost:5173` to access the application.
 - Persistent scan storage
 - Filtering and search
 - Detailed scan reports
-- Export options
 
 ## 🔒 Security Features
 
@@ -210,7 +190,7 @@ Visit `http://localhost:5173` to access the application.
 The AI-powered heuristic engine analyzes:
 
 - **URL Structure**: Length, special characters, encoding
-- **Domain Analysis**: Age, TLD, subdomain patterns
+- **Domain Analysis**: TLD, subdomain patterns
 - **Content Patterns**: Suspicious keywords, phishing indicators
 - **Technical Indicators**: HTTPS usage, IP-based URLs
 - **Behavioral Patterns**: Shortened URLs, redirect chains
@@ -233,36 +213,11 @@ The AI-powered heuristic engine analyzes:
 - `DELETE /api/history/:id` - Delete scan
 - `DELETE /api/history/clear` - Clear all history
 
-## 🎨 UI Components
-
-### InputBox
-- URL input with validation
-- Auto-HTTPS prepending
-- Example URL suggestions
-- Real-time error feedback
-
-### ResultCard
-- Tabbed interface (Overview, APIs, Heuristics, AI Analysis)
-- Risk gauge visualization
-- Warning system
-- Detailed breakdowns
-
-### RiskGauge
-- SVG-based circular gauge
-- Color-coded risk levels
-- Animated needle movement
-- Responsive design
-
 ## 🔷 Deployment
 
 ### Production Build
 ```bash
-# Frontend
-cd frontend
 npm run build
-
-# Backend
-cd backend
 npm start
 ```
 
@@ -272,18 +227,6 @@ Set production environment variables:
 - `MONGODB_URI` (production database)
 - `JWT_SECRET` (strong secret key)
 - API keys for external services
-
-### Docker Deployment
-```dockerfile
-# Example Dockerfile for backend
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-EXPOSE 5001
-CMD ["npm", "start"]
-```
 
 ## 🔷 Contributing
 
@@ -295,17 +238,13 @@ CMD ["npm", "start"]
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## 🔷 Acknowledgments
 
 - Google Safe Browsing API
 - VirusTotal API
 - React and Node.js communities
-
-## 🆘 Support
-
-For support, email support@linkguard.com or create an issue on GitHub.
 
 ---
 

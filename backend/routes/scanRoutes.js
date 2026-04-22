@@ -1,7 +1,7 @@
 const express = require('express');
 const { body } = require('express-validator');
 const { scanUrl, bulkScanUrls, getScanStats } = require('../controllers/scanController');
-const { protect, optionalAuth } = require('../middleware/auth');
+const { optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -29,9 +29,9 @@ const bulkValidation = [
     .withMessage('Each item must be a valid URL')
 ];
 
-// Routes - Now require authentication
-router.post('/', protect, urlValidation, scanUrl);
-router.post('/bulk', protect, bulkValidation, bulkScanUrls);
-router.get('/stats', optionalAuth, getScanStats); // Stats can remain optional
+// Routes
+router.post('/', optionalAuth, urlValidation, scanUrl);
+router.post('/bulk', optionalAuth, bulkValidation, bulkScanUrls);
+router.get('/stats', getScanStats);
 
 module.exports = router;
