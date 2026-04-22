@@ -67,8 +67,8 @@ export default function Navbar() {
                 <span className="user-avatar">👤</span>
                 <span className="user-name">{user.username}</span>
               </div>
-              <button className="btn-logout" onClick={handleLogout}>
-                Logout
+              <button className="btn-logout" onClick={handleLogout} title="Logout">
+                🚪 Logout
               </button>
             </div>
           ) : (
