@@ -50,12 +50,6 @@ export default function Navbar() {
             <span className="nav-icon">📚</span>
             Guide
           </Link>
-          {user && (
-            <Link to="/settings" className={`nav-link ${isActive('/settings') ? 'active' : ''}`}>
-              <span className="nav-icon">⚙️</span>
-              Settings
-            </Link>
-          )}
         </div>
 
         {/* Auth */}
@@ -112,9 +106,6 @@ export default function Navbar() {
           <Link to="/dashboard" className="mobile-link" onClick={() => setMenuOpen(false)}>Dashboard</Link>
           <Link to="/history" className="mobile-link" onClick={() => setMenuOpen(false)}>History</Link>
           <Link to="/scanner-guide" className="mobile-link" onClick={() => setMenuOpen(false)}>📚 Guide</Link>
-          {user && (
-            <Link to="/settings" className="mobile-link" onClick={() => setMenuOpen(false)}>⚙️ Settings</Link>
-          )}
         </nav>
         <div className="mobile-menu-footer">
           {user ? (
