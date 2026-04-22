@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkGuard Extension Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #3b82f6;
+            text-align: center;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            color: #1f2937;
+            margin-top: 0;
+        }
+        .test-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .test-link {
+            display: block;
+            padding: 10px 15px;
+            background: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #374151;
+            transition: background 0.2s;
+        }
+        .test-link:hover {
+            background: #f3f4f6;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .status-pending {
+            background: #6b7280;
+        }
+        .status-safe {
+            background: #10b981;
+        }
+        .status-warning {
+            background: #f59e0b;
+        }
+        .status-danger {
+            background: #ef4444;
+        }
+        .instructions {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .diagnostic-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .diagnostic-btn:hover {
+            background: #2563eb;
+        }
+        #diagnosticResults {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+        }
+        .expected-behavior {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .expected-behavior h4 {
+            color: #166534;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ LinkGuard Extension Test Page</h1>
+        
+        <div class="instructions">
+            <h3>📋 How to Test Your Extension</h3>
+            <ol>
+                <li><strong>Load Extension</strong>: Make sure LinkGuard extension is loaded in Chrome</li>
+                <li><strong>Start Backend</strong>: Ensure your backend is running on localhost:5001</li>
+                <li><strong>Watch Links</strong>: Links below should show safety indicators within 5-10 seconds</li>
+                <li><strong>Check Popup</strong>: Click the LinkGuard icon in toolbar to see page status</li>
+                <li><strong>Run Diagnostics</strong>: Use buttons below to troubleshoot issues</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Test Links</h2>
+            <p>These links should show LinkGuard safety indicators:</p>
+            
+            <div class="expected-behavior">
+                <h4>Expected Behavior:</h4>
+                <ul>
+                    <li>✅ <strong>Green checkmarks</strong> should appear on safe links</li>
+                    <li>⚠️ <strong>Yellow warnings</strong> may appear on some links</li>
+                    <li>🛑 <strong>Red blocks</strong> would appear on dangerous links</li>
+                    <li>🔄 <strong>Loading spinners</strong> show while scanning</li>
+                </ul>
+            </div>
+            
+            <div class="test-links">
+                <a href="https://google.com" class="test-link" target="_blank">
+                    <span class="status-indicator status-pending"></span>
+                    Google.com - Should be SAFE
+                </a>
+                
+                <a href="https://github.com" class="test-link" target="_blank">
+                    <span class="status-indicator status-pending"></span>
+                    GitHub.com - Should be SAFE
+                </a>
+                
+                <a href="https://stackoverflow.com" class="test-link" target="_blank">
+                    <span class="status-indicator status-pending"></span>
+                    StackOverflow.com - Should be SAFE
+                </a>
+                
+                <a href="https://wikipedia.org" class="test-link" target="_blank">
+                    <span class="status-indicator status-pending"></span>
+                    Wikipedia.org - Should be SAFE
+                </a>
+                
+                <a href="https://example.com" class="test-link" target="_blank">
+                    <span class="status-indicator status-pending"></span>
+                    Example.com - Test domain
+                </a>
+                
+                <a href="https://bit.ly/test123" class="test-link" target="_blank">
+                    <span class="status-indicator status-pending"></span>
+                    Bit.ly/test123 - Shortened URL (may show warning)
+                </a>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Diagnostic Tools</h2>
+            <p>Use these tools to troubleshoot extension issues:</p>
+            
+            <button class="diagnostic-btn" onclick="runQuickDiagnostic()">
+                🚀 Quick Diagnostic
+            </button>
+            
+            <button class="diagnostic-btn" onclick="testAPIConnection()">
+                🌐 Test API Connection
+            </button>
+            
+            <button class="diagnostic-btn" onclick="checkExtensionStatus()">
+                🔍 Check Extension Status
+            </button>
+            
+            <button class="diagnostic-btn" onclick="clearDiagnostics()">
+                🗑️ Clear Results
+            </button>
+            
+            <div id="diagnosticResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Extension Popup Test</h2>
+            <p>Click the LinkGuard icon in your Chrome toolbar. You should see:</p>
+            <ul>
+                <li>✅ Current page status (should show "Safe" for this page)</li>
+                <li>📊 Protection statistics</li>
+                <li>⚙️ Settings toggles that work</li>
+                <li>🔍 "Scan This Page" button</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🚨 Troubleshooting Checklist</h2>
+            <div id="troubleshootingChecklist">
+                <label><input type="checkbox"> Backend server running on localhost:5001</label><br>
+                <label><input type="checkbox"> Extension loaded in chrome://extensions/</label><br>
+                <label><input type="checkbox"> PNG icon files exist in icons/ folder</label><br>
+                <label><input type="checkbox"> Developer mode enabled in Chrome</label><br>
+                <label><input type="checkbox"> No CORS errors in browser console</label><br>
+                <label><input type="checkbox"> LinkGuard icon visible in Chrome toolbar</label><br>
+                <label><input type="checkbox"> Extension popup opens when clicked</label><br>
+                <label><input type="checkbox"> Safety indicators appear on links</label><br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let diagnosticOutput = '';
+
+        function log(message) {
+            diagnosticOutput += message + '\n';
+            document.getElementById('diagnosticResults').textContent = diagnosticOutput;
+            document.getElementById('diagnosticResults').style.display = 'block';
+            console.log(message);
+        }
+
+        function clearDiagnostics() {
+            diagnosticOutput = '';
+            document.getElementById('diagnosticResults').style.display = 'none';
+        }
+
+        async function runQuickDiagnostic() {
+            clearDiagnostics();
+            log('🛡️ LinkGuard Extension Quick Diagnostic');
+            log('=====================================\n');
+
+            // Check if extension elements exist
+            const linkGuardElements = document.querySelectorAll('.linkguard-indicator, .linkguard-loading');
+            log(`1. Content Script Status:`);
+            if (linkGuardElements.length > 0) {
+                log(`   ✅ Found ${linkGuardElements.length} LinkGuard indicators`);
+            } else {
+                log(`   ❌ No LinkGuard indicators found`);
+                log(`   💡 Try refreshing the page or reloading extension`);
+            }
+
+            // Check links
+            const links = document.querySelectorAll('a[href]');
+            log(`\n2. Page Analysis:`);
+            log(`   📊 Found ${links.length} links on page`);
+
+            // Check extension API
+            log(`\n3. Extension API:`);
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                log(`   ✅ Chrome extension API available`);
+                if (chrome.runtime.id) {
+                    log(`   ✅ Extension ID: ${chrome.runtime.id}`);
+                }
+            } else {
+                log(`   ❌ Chrome extension API not available`);
+            }
+
+            log(`\n4. Next Steps:`);
+            log(`   - Wait 5-10 seconds for indicators to appear`);
+            log(`   - Check browser console for errors (F12)`);
+            log(`   - Click LinkGuard icon in toolbar`);
+            log(`   - Try "Test API Connection" button`);
+        }
+
+        async function testAPIConnection() {
+            clearDiagnostics();
+            log('🌐 Testing LinkGuard API Connection');
+            log('==================================\n');
+
+            const apiUrl = 'http://localhost:5001/api/scan';
+            log(`Testing: ${apiUrl}`);
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url: 'https://google.com' })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ API Connection Successful!');
+                    log(`📊 Response: ${JSON.stringify(data, null, 2)}`);
+                } else {
+                    log(`❌ API Error: ${response.status} ${response.statusText}`);
+                    log('💡 Check if backend server is running');
+                }
+            } catch (error) {
+                log(`❌ Connection Failed: ${error.message}`);
+                
+                if (error.message.includes('CORS')) {
+                    log('\n💡 CORS Error Solution:');
+                    log('Add to your backend server.js:');
+                    log('app.use(cors({ origin: ["http://localhost:5173", "chrome-extension://*"] }));');
+                } else {
+                    log('\n💡 Solutions:');
+                    log('1. Start backend: cd backend && npm run dev');
+                    log('2. Check backend runs on port 5001');
+                    log('3. Verify no firewall blocking');
+                }
+            }
+        }
+
+        function checkExtensionStatus() {
+            clearDiagnostics();
+            log('🔍 Checking Extension Status');
+            log('============================\n');
+
+            // Check extension context
+            if (typeof chrome !== 'undefined') {
+                log('✅ Chrome API available');
+                
+                if (chrome.runtime && chrome.runtime.id) {
+                    log(`✅ Extension loaded: ${chrome.runtime.id}`);
+                } else {
+                    log('❌ Extension not properly loaded');
+                }
+
+                // Check permissions
+                if (chrome.permissions) {
+                    chrome.permissions.getAll((permissions) => {
+                        log(`📋 Permissions: ${JSON.stringify(permissions.permissions)}`);
+                    });
+                }
+            } else {
+                log('❌ Chrome API not available');
+                log('💡 Make sure you\'re in Chrome with extension loaded');
+            }
+
+            // Check DOM elements
+            const indicators = document.querySelectorAll('.linkguard-indicator');
+            const loading = document.querySelectorAll('.linkguard-loading');
+            
+            log(`\n📊 DOM Elements:`);
+            log(`   Indicators: ${indicators.length}`);
+            log(`   Loading: ${loading.length}`);
+
+            // Check for errors
+            log(`\n🔍 Console Check:`);
+            log('   Open browser console (F12) and look for:');
+            log('   - Red error messages');
+            log('   - CORS errors');
+            log('   - "Failed to fetch" messages');
+            log('   - LinkGuard-related errors');
+        }
+
+        // Auto-run diagnostic after page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                // Check if indicators appeared
+                const indicators = document.querySelectorAll('.linkguard-indicator');
+                if (indicators.length === 0) {
+                    console.log('⚠️ No LinkGuard indicators detected after 3 seconds');
+                    console.log('💡 Run diagnostics or check setup guide');
+                }
+            }, 3000);
+        });
+
+        // Update status indicators based on LinkGuard results
+        function updateLinkStatus(link, status) {
+            const indicator = link.querySelector('.status-indicator');
+            if (indicator) {
+                indicator.className = 'status-indicator';
+                if (status === 'safe') {
+                    indicator.classList.add('status-safe');
+                } else if (status === 'warning') {
+                    indicator.classList.add('status-warning');
+                } else if (status === 'danger') {
+                    indicator.classList.add('status-danger');
+                }
+            }
+        }
+
+        // Monitor for LinkGuard indicators
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === Node.ELEMENT_NODE && 
+                        node.classList && 
+                        node.classList.contains('linkguard-indicator')) {
+                        console.log('✅ LinkGuard indicator detected!');
+                    }
+                });
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    </script>
+</body>
+</html>
