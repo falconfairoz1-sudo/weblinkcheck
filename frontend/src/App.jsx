@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ScanProvider } from './context/ScanContext';
 import Navbar from './components/Navbar';
+import AIChat from './components/AIChat';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import History from './pages/History';
@@ -19,6 +20,7 @@ export default function App() {
       <ScanProvider>
         <div className="app-wrapper">
           <Navbar />
+          <AIChat />
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
