@@ -5,10 +5,12 @@
   right: 0;
   z-index: var(--z-fixed);
   background: var(--bg-glass);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
   border-bottom: 1px solid var(--border-primary);
   height: 70px;
   box-shadow: var(--shadow-lg);
+  transition: all var(--transition-normal);
 }
 
 .navbar::before {
@@ -20,6 +22,18 @@
   height: 1px;
   background: var(--gradient-border);
   animation: shimmer 3s ease-in-out infinite;
+}
+
+.navbar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-mesh);
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 .navbar-container {
@@ -42,25 +56,53 @@
   color: var(--text-primary);
   text-decoration: none;
   transition: all var(--transition-normal);
+  position: relative;
+  z-index: 1;
 }
 
 .navbar-logo:hover {
   transform: scale(1.05);
+  filter: drop-shadow(0 0 10px var(--text-accent));
 }
 
 .logo-icon {
   font-size: 1.5rem;
-  animation: rotate 10s linear infinite;
+  animation: rotate-pulse 10s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px var(--text-accent));
 }
 
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes rotate-pulse {
+  0%, 100% { 
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(90deg) scale(1.1);
+  }
+  50% { 
+    transform: rotate(180deg) scale(1);
+  }
+  75% {
+    transform: rotate(270deg) scale(1.1);
+  }
 }
 
 .logo-accent {
-  color: var(--text-accent);
-  text-shadow: 0 0 10px currentColor;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  position: relative;
+}
+
+.logo-accent::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  filter: blur(10px);
+  opacity: 0.5;
 }
 
 /* Navigation Links */
@@ -77,28 +119,47 @@
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
   position: relative;
+  overflow: hidden;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-glass);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.nav-link:hover::before {
+  left: 0;
 }
 
 .nav-link:hover {
   color: var(--text-primary);
-  background: var(--bg-hover);
+  transform: translateY(-2px);
 }
 
 .nav-link.active {
   color: var(--text-accent);
-  background: rgba(59, 130, 246, 0.1);
+  background: rgba(79, 158, 255, 0.12);
+  box-shadow: 0 0 20px rgba(79, 158, 255, 0.2);
 }
 
 .nav-link.active::after {
   content: '';
   position: absolute;
-  bottom: -2px;
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 20px;
+  width: 30px;
   height: 2px;
-  background: var(--text-accent);
+  background: var(--gradient-primary);
   border-radius: 1px;
+  box-shadow: 0 0 10px var(--text-accent);
 }
 
 /* Auth Section */
