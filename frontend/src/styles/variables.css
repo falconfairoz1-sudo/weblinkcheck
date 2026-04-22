@@ -1,0 +1,87 @@
+:root {
+  /* Colors - Enhanced with Modern Palette */
+  --bg-primary: #0f0f14;
+  --bg-secondary: #16161d;
+  --bg-tertiary: #1d1d26;
+  --bg-card: #1f1f2a;
+  --bg-input: #252532;
+  --bg-hover: #2a2a38;
+  --bg-glass: rgba(31, 31, 42, 0.75);
+  --bg-glass-strong: rgba(31, 31, 42, 0.95);
+  --bg-gradient-card: linear-gradient(145deg, rgba(31, 31, 42, 0.9) 0%, rgba(37, 37, 50, 0.8) 100%);
+  
+  --text-primary: #f8f9fa;
+  --text-secondary: #b4b8c5;
+  --text-muted: #7a7f8f;
+  --text-accent: #4f9eff;
+  
+  --border-primary: #2a2a38;
+  --border-secondary: #3d3d52;
+  --border-accent: #4f9eff;
+  
+  /* Status Colors - Enhanced */
+  --color-safe: #22c55e;
+  --color-safe-glow: rgba(34, 197, 94, 0.3);
+  --color-suspicious: #f59e0b;
+  --color-suspicious-glow: rgba(245, 158, 11, 0.3);
+  --color-malicious: #ef4444;
+  --color-malicious-glow: rgba(239, 68, 68, 0.3);
+  --color-unknown: #6b7280;
+  
+  /* Gradients - Enhanced with Modern Look */
+  --gradient-primary: linear-gradient(135deg, #4f9eff 0%, #3b7dd6 50%, #2563eb 100%);
+  --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+  --gradient-success: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+  --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  --gradient-hero: linear-gradient(135deg, #1f1f2a 0%, #2a2a38 50%, #1d1d26 100%);
+  --gradient-glass: linear-gradient(145deg, rgba(79, 158, 255, 0.12) 0%, rgba(37, 99, 235, 0.06) 100%);
+  --gradient-border: linear-gradient(90deg, transparent 0%, rgba(79, 158, 255, 0.4) 50%, transparent 100%);
+  --gradient-mesh: radial-gradient(at 40% 20%, rgba(79, 158, 255, 0.15) 0%, transparent 50%),
+                   radial-gradient(at 80% 0%, rgba(37, 99, 235, 0.12) 0%, transparent 50%),
+                   radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                   radial-gradient(at 80% 100%, rgba(79, 158, 255, 0.1) 0%, transparent 50%),
+                   radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.08) 0%, transparent 50%);
+  
+  /* Shadows - Enhanced with Depth */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 20px -5px rgba(0, 0, 0, 0.6), 0 4px 8px -2px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 30px -8px rgba(0, 0, 0, 0.7), 0 8px 16px -4px rgba(0, 0, 0, 0.5);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 0 30px rgba(79, 158, 255, 0.4), 0 0 60px rgba(79, 158, 255, 0.2);
+  --shadow-glow-sm: 0 0 15px rgba(79, 158, 255, 0.25), 0 0 30px rgba(79, 158, 255, 0.1);
+  --shadow-glow-success: 0 0 20px rgba(34, 197, 94, 0.3);
+  --shadow-glow-danger: 0 0 20px rgba(239, 68, 68, 0.3);
+  --shadow-inner: inset 0 2px 6px 0 rgba(0, 0, 0, 0.4);
+  
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s ease;
+  
+  /* Z-index */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal: 1040;
+  --z-popover: 1050;
+  --z-tooltip: 1060;
+}
