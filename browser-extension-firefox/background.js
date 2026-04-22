@@ -1,5 +1,5 @@
-// LinkGuard Browser Extension - Background Script
-class LinkGuardBackground {
+// LinkGuard Firefox Extension - Background Script
+class LinkGuardFirefoxBackground {
   constructor() {
     this.apiUrl = 'http://localhost:5001/api'; // Your LinkGuard API
     this.cache = new Map();
@@ -8,59 +8,31 @@ class LinkGuardBackground {
   }
 
   init() {
-    // Listen for navigation events
-    chrome.webNavigation.onBeforeNavigate.addListener((details) => {
-      if (details.frameId === 0) { // Main frame only
-        this.checkUrl(details.url, details.tabId);
-      }
-    });
+    // Listen for navigation events (Firefox API)
+    if (browser.webNavigation) {
+      browser.webNavigation.onBeforeNavigate.addListener((details) => {
+        if (details.frameId === 0) { // Main frame only
+          this.checkUrl(details.url, details.tabId);
+        }
+      });
+    }
 
     // Listen for messages from content script
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      console.log('Background received message:', request);
-      
+    browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.action === 'scanUrl') {
-        this.scanUrl(request.url).then((result) => {
-          console.log('Sending scan result:', result);
-          sendResponse(result);
-        }).catch((error) => {
-          console.error('Error in scanUrl handler:', error);
-          sendResponse({
-            error: true,
-            message: error.message,
-            url: request.url
-          });
-        });
+        this.scanUrl(request.url).then(sendResponse);
         return true; // Keep message channel open for async response
       } else if (request.action === 'getSettings') {
-        this.getSettings().then((settings) => {
-          console.log('Sending settings:', settings);
-          sendResponse(settings);
-        }).catch((error) => {
-          console.error('Error in getSettings handler:', error);
-          sendResponse({
-            enabled: true,
-            showNotifications: true,
-            blockDangerous: false,
-            authToken: null,
-            apiUrl: 'http://localhost:5001/api'
-          });
-        });
+        this.getSettings().then(sendResponse);
         return true;
       } else if (request.action === 'updateSettings') {
-        this.updateSettings(request.settings).then((result) => {
-          console.log('Settings updated:', result);
-          sendResponse(result);
-        }).catch((error) => {
-          console.error('Error in updateSettings handler:', error);
-          sendResponse({ error: true, message: error.message });
-        });
+        this.updateSettings(request.settings).then(sendResponse);
         return true;
       }
     });
 
     // Set default settings on install
-    chrome.runtime.onInstalled.addListener(() => {
+    browser.runtime.onInstalled.addListener(() => {
       this.setDefaultSettings();
     });
   }
@@ -68,7 +40,10 @@ class LinkGuardBackground {
   async checkUrl(url, tabId) {
     try {
       // Skip internal pages and extensions
-      if (url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url.startsWith('moz-extension://')) {
+      if (url.startsWith('about:') || 
+          url.startsWith('moz-extension://') || 
+          url.startsWith('chrome://') ||
+          url.startsWith('chrome-extension://')) {
         return;
       }
 
@@ -88,13 +63,10 @@ class LinkGuardBackground {
 
   async scanUrl(url) {
     try {
-      console.log('Scanning URL:', url);
-      
       // Check cache first
       const cacheKey = url;
       const cached = this.cache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
-        console.log('Returning cached result for:', url);
         return cached.data;
       }
 
@@ -108,8 +80,6 @@ class LinkGuardBackground {
         headers['Authorization'] = `Bearer ${settings.authToken}`;
       }
 
-      console.log('Making API request to:', `${this.apiUrl}/scan`);
-
       // Call your existing LinkGuard API
       const response = await fetch(`${this.apiUrl}/scan`, {
         method: 'POST',
@@ -117,14 +87,11 @@ class LinkGuardBackground {
         body: JSON.stringify({ url })
       });
 
-      console.log('API response status:', response.status);
-
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+        throw new Error(`API request failed: ${response.status}`);
       }
 
       const result = await response.json();
-      console.log('API response data:', result);
       
       // Cache the result
       this.cache.set(cacheKey, {
@@ -135,19 +102,13 @@ class LinkGuardBackground {
       return result;
     } catch (error) {
       console.error('Error scanning URL:', error);
-      
-      // Return detailed error information
+      // Return safe result on error to avoid blocking user
       return {
         url,
         status: 'unknown',
         riskScore: 0,
-        warnings: [`Unable to scan: ${error.message}`],
-        error: true,
-        errorDetails: {
-          message: error.message,
-          type: error.name,
-          apiUrl: this.apiUrl
-        }
+        warnings: ['Unable to scan - network error'],
+        error: true
       };
     }
   }
@@ -170,8 +131,9 @@ class LinkGuardBackground {
       badgeColor = '#10b981'; // Green
     }
 
-    chrome.action.setBadgeText({ text: badgeText, tabId });
-    chrome.action.setBadgeBackgroundColor({ color: badgeColor, tabId });
+    // Firefox uses browserAction instead of action
+    browser.browserAction.setBadgeText({ text: badgeText, tabId });
+    browser.browserAction.setBadgeBackgroundColor({ color: badgeColor, tabId });
   }
 
   async showThreatNotification(url, result) {
@@ -179,18 +141,17 @@ class LinkGuardBackground {
     if (!settings.showNotifications) return;
 
     const domain = new URL(url).hostname;
-    chrome.notifications.create({
+    browser.notifications.create({
       type: 'basic',
       iconUrl: 'icons/icon48.png',
       title: '🛡️ LinkGuard Threat Detected',
-      message: `Dangerous site blocked: ${domain}\nRisk Score: ${result.riskScore}/100`,
-      priority: 2
+      message: `Dangerous site blocked: ${domain}\nRisk Score: ${result.riskScore}/100`
     });
   }
 
   async getSettings() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get({
+      browser.storage.sync.get({
         enabled: true,
         showNotifications: true,
         blockDangerous: false,
@@ -202,7 +163,7 @@ class LinkGuardBackground {
 
   async updateSettings(settings) {
     return new Promise((resolve) => {
-      chrome.storage.sync.set(settings, resolve);
+      browser.storage.sync.set(settings, resolve);
     });
   }
 
@@ -218,5 +179,5 @@ class LinkGuardBackground {
   }
 }
 
-// Initialize background script
-new LinkGuardBackground();
+// Initialize background script for Firefox
+new LinkGuardFirefoxBackground();

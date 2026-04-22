@@ -337,3 +337,25 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Additional Error States */
+.status-error {
+  color: var(--danger-color, #ef4444) !important;
+}
+
+/* Debug info */
+.debug-info {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+  font-family: monospace;
+  font-size: 11px;
+  color: #6c757d;
+  display: none;
+}
+
+.debug-info.show {
+  display: block;
+}
