@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
+import AdvancedAnalytics from '../components/AdvancedAnalytics';
 import { getStatusColor, getStatusIcon, formatDate } from '../utils/helpers';
 import '../styles/dashboard.css';
 
@@ -90,6 +91,13 @@ export default function Dashboard() {
               color="#ef4444"
             />
           </div>
+
+          {/* Advanced Analytics */}
+          {recentScans.length > 0 && (
+            <div className="dashboard-section">
+              <AdvancedAnalytics scanData={recentScans} />
+            </div>
+          )}
 
           {/* Recent Activity */}
           <div className="dashboard-section">

@@ -152,6 +152,32 @@
   padding: 20px;
 }
 
+/* Report Section */
+.report-section {
+  padding: 40px 20px;
+}
+
+.report-wrapper {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.report-wrapper h2 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.report-wrapper p {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
 /* Comparison Section */
 .comparison-section {
   padding: 40px 20px;

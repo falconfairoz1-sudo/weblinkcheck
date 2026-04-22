@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../utils/api';
+import ReportGenerator from './ReportGenerator';
 import '../styles/scannerexplainer.css';
 
 export default function ScannerExplainer({ url, scannerType }) {
@@ -187,6 +188,9 @@ export default function ScannerExplainer({ url, scannerType }) {
             {loading ? '⏳ Generating...' : '🤖 Get AI Explanation for This URL'}
           </button>
         )}
+
+        {/* Report Generator */}
+        <ReportGenerator scannerType={scannerType} analysisData={explanation} />
       </div>
     </div>
   );

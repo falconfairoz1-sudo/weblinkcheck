@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ScannerExplainer from '../components/ScannerExplainer';
+import ReportGenerator from '../components/ReportGenerator';
 import '../styles/scannerguide.css';
 
 export default function ScannerGuide() {
@@ -18,12 +19,6 @@ export default function ScannerGuide() {
       name: '📷 QR Code Scanner',
       icon: '📷',
       description: 'Scans QR codes for hidden threats'
-    },
-    {
-      id: 'content_scanner',
-      name: '🔍 Content Scanner',
-      icon: '🔍',
-      description: 'Analyzes text for scam indicators'
     },
     {
       id: 'monitor',
@@ -90,6 +85,17 @@ export default function ScannerGuide() {
         </div>
       </section>
 
+      {/* Report Generator */}
+      <section className="report-section">
+        <div className="container">
+          <div className="report-wrapper">
+            <h2>📄 Generate Report</h2>
+            <p>Download a comprehensive PDF report for this scanner</p>
+            <ReportGenerator scannerType={selectedScanner} />
+          </div>
+        </div>
+      </section>
+
       {/* Comparison Table */}
       <section className="comparison-section">
         <div className="container">
@@ -101,7 +107,6 @@ export default function ScannerGuide() {
                   <th>Feature</th>
                   <th>URL Scanner</th>
                   <th>QR Scanner</th>
-                  <th>Content Scanner</th>
                   <th>Monitor</th>
                 </tr>
               </thead>
@@ -111,18 +116,15 @@ export default function ScannerGuide() {
                   <td>✅</td>
                   <td>✅</td>
                   <td>✅</td>
-                  <td>✅</td>
                 </tr>
                 <tr>
                   <td>Malware Detection</td>
                   <td>✅</td>
                   <td>✅</td>
-                  <td>❌</td>
                   <td>✅</td>
                 </tr>
                 <tr>
                   <td>Phishing Detection</td>
-                  <td>✅</td>
                   <td>✅</td>
                   <td>✅</td>
                   <td>✅</td>
@@ -132,18 +134,15 @@ export default function ScannerGuide() {
                   <td>✅</td>
                   <td>✅</td>
                   <td>✅</td>
-                  <td>✅</td>
                 </tr>
                 <tr>
                   <td>Continuous Monitoring</td>
-                  <td>❌</td>
                   <td>❌</td>
                   <td>❌</td>
                   <td>✅</td>
                 </tr>
                 <tr>
                   <td>Alerts & Notifications</td>
-                  <td>❌</td>
                   <td>❌</td>
                   <td>❌</td>
                   <td>✅</td>
@@ -153,11 +152,9 @@ export default function ScannerGuide() {
                   <td>✅</td>
                   <td>✅</td>
                   <td>✅</td>
-                  <td>✅</td>
                 </tr>
                 <tr>
                   <td>API Integration</td>
-                  <td>✅</td>
                   <td>✅</td>
                   <td>✅</td>
                   <td>✅</td>
@@ -187,24 +184,18 @@ export default function ScannerGuide() {
 
             <div className="practice-card">
               <span className="practice-icon">3️⃣</span>
-              <h3>Check Suspicious Messages</h3>
-              <p>Use the Content Scanner to analyze suspicious messages for scam indicators</p>
-            </div>
-
-            <div className="practice-card">
-              <span className="practice-icon">4️⃣</span>
               <h3>Monitor Important Sites</h3>
               <p>Use Monitor to continuously track your business or frequently visited websites</p>
             </div>
 
             <div className="practice-card">
-              <span className="practice-icon">5️⃣</span>
+              <span className="practice-icon">4️⃣</span>
               <h3>Trust Your Instincts</h3>
               <p>If something feels off, use a scanner to verify. Better safe than sorry</p>
             </div>
 
             <div className="practice-card">
-              <span className="practice-icon">6️⃣</span>
+              <span className="practice-icon">5️⃣</span>
               <h3>Report Threats</h3>
               <p>Report malicious URLs and scams to help protect the community</p>
             </div>

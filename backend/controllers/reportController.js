@@ -1,321 +1,177 @@
-const PDFDocument = require('pdfkit');
-const Scan = require('../models/Scan');
+const { generateScannerReport } = require('../services/reportGenerator');
+const fs = require('fs');
+const path = require('path');
 
 /**
- * Generate PDF report for a single scan
+ * Generate and download scanner report
  */
-exports.generatePDFReport = async (req, res) => {
+exports.generateReport = async (req, res) => {
   try {
-    const scan = await Scan.findOne({
-      _id: req.params.id,
-      userId: req.user._id
-    });
+    const { scannerType, analysisData } = req.body;
 
-    if (!scan) {
-      return res.status(404).json({ error: 'Scan not found' });
+    // Validate input
+    if (!scannerType) {
+      return res.status(400).json({ error: 'Scanner type is required' });
     }
 
-    // Create PDF document
-    const doc = new PDFDocument({ margin: 50 });
-
-    // Set response headers
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=scan-report-${scan._id}.pdf`);
-
-    // Pipe PDF to response
-    doc.pipe(res);
-
-    // Header
-    doc.fontSize(24).fillColor('#3b82f6').text('LinkGuard Security Report', { align: 'center' });
-    doc.moveDown();
-    doc.fontSize(10).fillColor('#666').text(`Generated: ${new Date().toLocaleString()}`, { align: 'center' });
-    doc.moveDown(2);
-
-    // URL Information
-    doc.fontSize(16).fillColor('#000').text('URL Analysis', { underline: true });
-    doc.moveDown(0.5);
-    doc.fontSize(11).fillColor('#333').text(`URL: ${scan.url}`);
-    doc.text(`Scanned: ${scan.createdAt.toLocaleString()}`);
-    doc.text(`Domain: ${scan.domain || 'N/A'}`);
-    doc.moveDown();
-
-    // Risk Score
-    doc.fontSize(16).fillColor('#000').text('Risk Assessment', { underline: true });
-    doc.moveDown(0.5);
-    
-    const statusColor = scan.status === 'safe' ? '#10b981' : scan.status === 'suspicious' ? '#f59e0b' : '#ef4444';
-    doc.fontSize(14).fillColor(statusColor).text(`Status: ${scan.status.toUpperCase()}`);
-    doc.fontSize(11).fillColor('#333').text(`Risk Score: ${scan.riskScore || 0}/100`);
-    doc.moveDown();
-
-    // Heuristic Analysis
-    if (scan.heuristics) {
-      doc.fontSize(16).fillColor('#000').text('Heuristic Analysis', { underline: true });
-      doc.moveDown(0.5);
-      doc.fontSize(11).fillColor('#333');
-      
-      const heuristics = scan.heuristics;
-      doc.text(`• Has HTTPS: ${heuristics.hasHttps ? 'Yes' : 'No'}`);
-      doc.text(`• Is Shortened: ${heuristics.isShortened ? 'Yes' : 'No'}`);
-      doc.text(`• Suspicious Keywords: ${heuristics.hasSuspiciousKeywords ? 'Detected' : 'None'}`);
-      doc.text(`• IP-based URL: ${heuristics.isIpBased ? 'Yes' : 'No'}`);
-      doc.text(`• Domain Length: ${heuristics.domainLength || 'N/A'}`);
-      doc.text(`• TLD: ${heuristics.tld || 'N/A'}`);
-      doc.moveDown();
+    const validScanners = ['url_scanner', 'qr_scanner', 'content_scanner', 'monitor'];
+    if (!validScanners.includes(scannerType)) {
+      return res.status(400).json({ error: 'Invalid scanner type' });
     }
 
-    // Google Safe Browsing
-    if (scan.googleSafeBrowsing && scan.googleSafeBrowsing.checked) {
-      doc.fontSize(16).fillColor('#000').text('Google Safe Browsing', { underline: true });
-      doc.moveDown(0.5);
-      doc.fontSize(11).fillColor('#333');
-      
-      const google = scan.googleSafeBrowsing;
-      doc.text(`Status: ${google.isSafe ? 'Safe' : 'Threat Detected'}`);
-      if (google.threats && google.threats.length > 0) {
-        doc.text(`Threats: ${google.threats.join(', ')}`);
+    // Generate PDF report
+    const filePath = await generateScannerReport(scannerType, analysisData);
+
+    // Send file
+    res.download(filePath, `scanner-report-${scannerType}-${Date.now()}.pdf`, (err) => {
+      if (err) {
+        console.error('Error sending file:', err);
       }
-      doc.moveDown();
-    }
-
-    // VirusTotal
-    if (scan.virusTotal && scan.virusTotal.checked) {
-      doc.fontSize(16).fillColor('#000').text('VirusTotal Analysis', { underline: true });
-      doc.moveDown(0.5);
-      doc.fontSize(11).fillColor('#333');
-      
-      const vt = scan.virusTotal;
-      doc.text(`Detections: ${vt.positives || 0}/${vt.total || 0} engines`);
-      if (vt.positives > 0) {
-        doc.fillColor('#ef4444').text(`⚠️ ${vt.positives} security vendors flagged this URL as malicious`);
-      }
-      doc.moveDown();
-    }
-
-    // Warnings
-    if (scan.warnings && scan.warnings.length > 0) {
-      doc.fontSize(16).fillColor('#000').text('Security Warnings', { underline: true });
-      doc.moveDown(0.5);
-      doc.fontSize(11).fillColor('#ef4444');
-      
-      scan.warnings.forEach(warning => {
-        const message = typeof warning === 'string' ? warning : warning.message;
-        doc.text(`⚠️ ${message}`);
+      // Clean up temp file after sending
+      fs.unlink(filePath, (unlinkErr) => {
+        if (unlinkErr) console.error('Error deleting temp file:', unlinkErr);
       });
-      doc.moveDown();
-    }
-
-    // AI Analysis
-    if (scan.aiAnalysis) {
-      doc.fontSize(16).fillColor('#000').text('AI Analysis', { underline: true });
-      doc.moveDown(0.5);
-      doc.fontSize(11).fillColor('#333');
-      
-      const ai = scan.aiAnalysis;
-      doc.text(`Phishing Probability: ${ai.phishingProbability || 0}%`);
-      doc.text(`Confidence: ${ai.confidence || 'N/A'}`);
-      if (ai.explanation && ai.explanation.length > 0) {
-        doc.text(`Analysis: ${ai.explanation.join('. ')}`);
-      }
-      doc.moveDown();
-    }
-
-    // Footer
-    doc.fontSize(8).fillColor('#999').text(
-      'This report is generated by LinkGuard AI-Powered Link Safety Checker. ' +
-      'Results should be used as guidance only. Always exercise caution when visiting unknown URLs.',
-      50,
-      doc.page.height - 50,
-      { align: 'center', width: doc.page.width - 100 }
-    );
-
-    // Finalize PDF
-    doc.end();
+    });
   } catch (error) {
-    console.error('PDF generation error:', error);
-    res.status(500).json({ error: 'Failed to generate PDF report' });
+    console.error('Report generation error:', error);
+    res.status(500).json({ error: 'Failed to generate report' });
   }
 };
 
 /**
- * Generate PDF export of scan history
+ * Get scanner information
  */
-exports.generatePDFHistoryReport = async (req, res) => {
+exports.getScannerInfo = (req, res) => {
   try {
-    console.log('Generating PDF history report for user:', req.user._id);
-    
-    const scans = await Scan.find({ userId: req.user._id })
-      .sort({ createdAt: -1 })
-      .limit(500);
+    const { scannerType } = req.params;
 
-    console.log(`Found ${scans.length} scans for user`);
+    const scannerInfo = {
+      url_scanner: {
+        title: '🔗 URL Scanner Report',
+        description: 'Comprehensive analysis of link security threats',
+        overview: 'The URL Scanner analyzes links for security threats using multiple detection methods including Google Safe Browsing, VirusTotal, and AI heuristics. It provides a risk score and detailed threat analysis.',
+        features: [
+          'Real-time URL scanning',
+          'Google Safe Browsing integration',
+          'VirusTotal malware detection',
+          'AI heuristic analysis',
+          'Risk scoring (0-100)',
+          'Shortened URL detection',
+          'IP-based URL identification',
+          'Suspicious keyword detection',
+          'SSL/HTTPS verification',
+          'Domain age analysis'
+        ],
+        detects: [
+          'Phishing attacks and fake login pages',
+          'Malware distribution sites',
+          'Ransomware delivery URLs',
+          'Credential theft attempts',
+          'Drive-by download attacks',
+          'Suspicious redirects',
+          'Fake e-commerce sites',
+          'Scam landing pages',
+          'Unencrypted connections',
+          'Recently registered malicious domains'
+        ]
+      },
+      qr_scanner: {
+        title: '📷 QR Code Scanner Report',
+        description: 'Analysis of QR codes for hidden threats',
+        overview: 'The QR Code Scanner decodes QR codes and analyzes the hidden URLs for security threats. It helps you see where a QR code leads before scanning it with your phone.',
+        features: [
+          'QR code decoding',
+          'Hidden URL extraction',
+          'URL threat analysis',
+          'Camera-based scanning',
+          'Image upload support',
+          'Real-time processing',
+          'Malicious QR detection',
+          'Redirect analysis',
+          'Phishing QR identification',
+          'Batch QR scanning'
+        ],
+        detects: [
+          'Malicious URLs hidden in QR codes',
+          'Phishing QR codes',
+          'Malware distribution QR codes',
+          'Fake payment QR codes',
+          'Credential harvesting attempts',
+          'Suspicious redirects',
+          'Shortened URL QR codes',
+          'Fake WiFi QR codes',
+          'Malicious app installation QR codes',
+          'Scam landing page QR codes'
+        ]
+      },
+      content_scanner: {
+        title: '🔍 Content Scanner Report',
+        description: 'Analysis of text content for scam indicators',
+        overview: 'The Content Scanner analyzes text messages, emails, and other content for scam indicators. It detects crypto fraud, job scams, and general phishing attempts using AI pattern recognition.',
+        features: [
+          'Crypto fraud detection',
+          'Job scam identification',
+          'General phishing detection',
+          'Urgency language analysis',
+          'Suspicious keyword detection',
+          'Scam probability calculation',
+          'Indicator highlighting',
+          'Confidence scoring',
+          'Multi-language support',
+          'Real-time analysis'
+        ],
+        detects: [
+          'Cryptocurrency investment scams',
+          'Fake job offers',
+          'Prize and reward scams',
+          'Urgent action requests',
+          'Personal data requests',
+          'Financial fraud attempts',
+          'Wallet verification scams',
+          'Upfront payment requests',
+          'Fake employment opportunities',
+          'Inheritance and lottery scams'
+        ]
+      },
+      monitor: {
+        title: '👁️ Monitor Report',
+        description: 'Continuous monitoring of URLs for threat changes',
+        overview: 'The Monitor continuously tracks URLs for security changes. It performs automatic daily scans and alerts you when threats are detected on previously safe URLs.',
+        features: [
+          'Real-time threat monitoring',
+          'Automatic daily scans',
+          'Alert notifications',
+          'Historical threat tracking',
+          'Trend analysis',
+          'Scheduled monitoring',
+          'Multi-URL tracking',
+          'Threat change detection',
+          'Email notifications',
+          'Dashboard reporting'
+        ],
+        detects: [
+          'New threats on previously safe URLs',
+          'Compromised websites',
+          'Malware injection',
+          'Phishing page updates',
+          'Domain takeovers',
+          'Content changes',
+          'SSL certificate issues',
+          'Redirect changes',
+          'Server compromises',
+          'Defacement attempts'
+        ]
+      }
+    };
 
-    if (scans.length === 0) {
-      return res.status(404).json({ error: 'No scan history found' });
+    const info = scannerInfo[scannerType];
+    if (!info) {
+      return res.status(404).json({ error: 'Scanner type not found' });
     }
 
-    // Create PDF document
-    const doc = new PDFDocument({ margin: 50, size: 'A4' });
-
-    // Set response headers
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=linkguard-scan-history-${new Date().toISOString().split('T')[0]}.pdf`);
-
-    // Pipe PDF to response
-    doc.pipe(res);
-
-    // Header
-    doc.fontSize(24).fillColor('#3b82f6').text('LinkGuard Scan History Report', { align: 'center' });
-    doc.moveDown();
-    doc.fontSize(12).fillColor('#666').text(`Generated: ${new Date().toLocaleString()}`, { align: 'center' });
-    doc.fontSize(10).fillColor('#666').text(`Total Scans: ${scans.length}`, { align: 'center' });
-    doc.moveDown(2);
-
-    // Summary Statistics
-    const safeCount = scans.filter(s => s.status === 'safe').length;
-    const suspiciousCount = scans.filter(s => s.status === 'suspicious').length;
-    const maliciousCount = scans.filter(s => s.status === 'malicious').length;
-    const avgRiskScore = scans.length > 0 ? Math.round(scans.reduce((sum, s) => sum + (s.riskScore || 0), 0) / scans.length) : 0;
-
-    doc.fontSize(16).fillColor('#000').text('Summary Statistics', { underline: true });
-    doc.moveDown(0.5);
-    doc.fontSize(11).fillColor('#333');
-    doc.text(`• Total Scans: ${scans.length}`);
-    doc.fillColor('#10b981').text(`• Safe URLs: ${safeCount} (${Math.round(safeCount/scans.length*100)}%)`);
-    doc.fillColor('#f59e0b').text(`• Suspicious URLs: ${suspiciousCount} (${Math.round(suspiciousCount/scans.length*100)}%)`);
-    doc.fillColor('#ef4444').text(`• Malicious URLs: ${maliciousCount} (${Math.round(maliciousCount/scans.length*100)}%)`);
-    doc.fillColor('#333').text(`• Average Risk Score: ${avgRiskScore}/100`);
-    doc.moveDown(2);
-
-    // Scan History Table Header
-    doc.fontSize(16).fillColor('#000').text('Detailed Scan History', { underline: true });
-    doc.moveDown(1);
-
-    // Table setup
-    let currentY = doc.y;
-    const itemHeight = 20;
-
-    // Table headers
-    doc.fontSize(9).fillColor('#666');
-    doc.text('Date', 50, currentY, { width: 80 });
-    doc.text('URL', 130, currentY, { width: 200 });
-    doc.text('Status', 330, currentY, { width: 60 });
-    doc.text('Risk', 390, currentY, { width: 40 });
-    doc.text('Threats', 430, currentY, { width: 100 });
-
-    // Draw header line
-    currentY += 15;
-    doc.moveTo(50, currentY).lineTo(530, currentY).stroke();
-    currentY += 10;
-
-    // Table rows
-    scans.forEach((scan, index) => {
-      // Check if we need a new page
-      if (currentY > doc.page.height - 100) {
-        doc.addPage();
-        currentY = 50;
-        
-        // Redraw headers on new page
-        doc.fontSize(9).fillColor('#666');
-        doc.text('Date', 50, currentY, { width: 80 });
-        doc.text('URL', 130, currentY, { width: 200 });
-        doc.text('Status', 330, currentY, { width: 60 });
-        doc.text('Risk', 390, currentY, { width: 40 });
-        doc.text('Threats', 430, currentY, { width: 100 });
-        currentY += 15;
-        doc.moveTo(50, currentY).lineTo(530, currentY).stroke();
-        currentY += 10;
-      }
-
-      // Row data
-      const date = scan.createdAt.toLocaleDateString();
-      const url = scan.url.length > 35 ? scan.url.substring(0, 32) + '...' : scan.url;
-      const status = scan.status.toUpperCase();
-      const riskScore = scan.riskScore || 0;
-      
-      // Determine threats
-      let threats = [];
-      if (scan.googleSafeBrowsing && !scan.googleSafeBrowsing.isSafe) {
-        threats.push('Google');
-      }
-      if (scan.virusTotal && scan.virusTotal.positives > 0) {
-        threats.push(`VT:${scan.virusTotal.positives}`);
-      }
-      const threatText = threats.length > 0 ? threats.join(', ') : 'None';
-
-      // Set row color based on status
-      const statusColor = scan.status === 'safe' ? '#10b981' : 
-                         scan.status === 'suspicious' ? '#f59e0b' : '#ef4444';
-
-      doc.fontSize(8).fillColor('#333');
-      doc.text(date, 50, currentY, { width: 80 });
-      doc.text(url, 130, currentY, { width: 200 });
-      doc.fillColor(statusColor).text(status, 330, currentY, { width: 60 });
-      doc.fillColor('#333').text(riskScore.toString(), 390, currentY, { width: 40 });
-      doc.text(threatText, 430, currentY, { width: 100 });
-
-      currentY += itemHeight;
-
-      // Draw separator line every 5 rows
-      if ((index + 1) % 5 === 0) {
-        doc.moveTo(50, currentY - 5).lineTo(530, currentY - 5).strokeColor('#eee').stroke();
-      }
-    });
-
-    // Footer
-    const footerY = doc.page.height - 50;
-    doc.fontSize(8).fillColor('#999').text(
-      'This report contains your LinkGuard scan history. Keep this document secure as it may contain sensitive URL information. ' +
-      'Generated by LinkGuard AI-Powered Link Safety Checker.',
-      50,
-      footerY,
-      { align: 'center', width: doc.page.width - 100 }
-    );
-
-    // Finalize PDF
-    doc.end();
-    
-    console.log('PDF generation completed successfully');
-    
+    res.json(info);
   } catch (error) {
-    console.error('PDF history generation error:', error);
-    res.status(500).json({ error: 'Failed to generate PDF history report' });
-  }
-};
-
-/**
- * Generate CSV export of scan history (keeping for backward compatibility)
- */
-exports.generateCSVReport = async (req, res) => {
-  try {
-    const scans = await Scan.find({ userId: req.user._id })
-      .sort({ createdAt: -1 })
-      .limit(1000);
-
-    if (scans.length === 0) {
-      return res.status(404).json({ error: 'No scan history found' });
-    }
-
-    // CSV headers
-    let csv = 'Date,URL,Status,Risk Score,Google Safe Browsing,VirusTotal Detections\n';
-
-    // CSV rows
-    scans.forEach(scan => {
-      const date = scan.createdAt.toISOString();
-      const url = `"${scan.url.replace(/"/g, '""')}"`;
-      const status = scan.status;
-      const riskScore = scan.riskScore || 0;
-      const googleSafe = scan.googleSafeBrowsing?.isSafe ? 'Safe' : 'Threat';
-      const vtDetections = scan.virusTotal?.positives || 0;
-
-      csv += `${date},${url},${status},${riskScore},${googleSafe},${vtDetections}\n`;
-    });
-
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=linkguard-scan-history.csv');
-    res.send(csv);
-  } catch (error) {
-    console.error('CSV generation error:', error);
-    res.status(500).json({ error: 'Failed to generate CSV report' });
+    console.error('Error fetching scanner info:', error);
+    res.status(500).json({ error: 'Failed to fetch scanner information' });
   }
 };

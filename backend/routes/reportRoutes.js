@@ -1,18 +1,17 @@
 const express = require('express');
-const {
-  generatePDFReport,
-  generateCSVReport,
-  generatePDFHistoryReport
-} = require('../controllers/reportController');
-const { protect } = require('../middleware/auth');
-
 const router = express.Router();
+const reportController = require('../controllers/reportController');
 
-// All routes require authentication
-router.use(protect);
+/**
+ * POST /api/report/generate
+ * Generate and download a scanner report
+ */
+router.post('/generate', reportController.generateReport);
 
-router.get('/pdf/:id', generatePDFReport);
-router.get('/pdf-history', generatePDFHistoryReport);
-router.get('/csv', generateCSVReport);
+/**
+ * GET /api/report/info/:scannerType
+ * Get scanner information
+ */
+router.get('/info/:scannerType', reportController.getScannerInfo);
 
 module.exports = router;

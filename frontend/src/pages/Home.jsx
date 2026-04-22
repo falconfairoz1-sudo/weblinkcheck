@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import InputBox from '../components/InputBox';
 import ResultCard from '../components/ResultCard';
 import BulkScanner from '../components/BulkScanner';
+import AdvancedAnalytics from '../components/AdvancedAnalytics';
+import ExportData from '../components/ExportData';
 import { useScan } from '../context/ScanContext';
 import '../styles/home.css';
 
@@ -105,6 +107,12 @@ export default function Home() {
       {currentScan && !scanning && (
         <section className="result-section">
           <ResultCard result={currentScan} />
+          
+          {/* Advanced Analytics */}
+          <div className="advanced-features">
+            <AdvancedAnalytics scanData={currentScan} />
+            <ExportData scanData={currentScan} />
+          </div>
         </section>
       )}
 
