@@ -1,6 +1,6 @@
 const Jimp = require('jimp');
 const jsQR = require('jsqr');
-const { analyzeUrl } = require('../utils/urlAnalyzer');
+const { analyzeUrlHeuristics, calculateRiskScore, determineStatus, generateWarnings } = require('../utils/urlAnalyzer');
 const { checkGoogleSafeBrowsing } = require('../services/googleSafeBrowsing');
 const { checkVirusTotal } = require('../services/virusTotal');
 const Scan = require('../models/Scan');
@@ -41,25 +41,27 @@ exports.scanQRCode = async (req, res) => {
     }
 
     // Perform full URL scan
-    const heuristicAnalysis = analyzeUrl(url);
+    const heuristics = analyzeUrlHeuristics(url);
     const googleResult = await checkGoogleSafeBrowsing(url);
     const virusTotalResult = await checkVirusTotal(url);
 
-    const riskScore = Math.round(
-      heuristicAnalysis.riskScore * 0.4 +
-      (googleResult.isSafe ? 0 : 40) +
-      (virusTotalResult.positives > 0 ? virusTotalResult.positives * 3 : 0)
-    );
+    const { score: riskScore, explanation, confidence } = calculateRiskScore({
+      heuristics,
+      googleResult,
+      virusTotalResult,
+      domainAge: null
+    });
 
     const result = {
       url,
       qrContent: url,
       isUrl: true,
       riskScore: Math.min(riskScore, 100),
-      status: riskScore < 30 ? 'safe' : riskScore < 70 ? 'suspicious' : 'dangerous',
-      heuristicAnalysis,
+      status: determineStatus(riskScore, googleResult),
+      heuristicAnalysis: heuristics,
       googleSafeBrowsing: googleResult,
       virusTotal: virusTotalResult,
+      aiAnalysis: { phishingProbability: riskScore, explanation, confidence },
       scannedAt: new Date()
     };
 

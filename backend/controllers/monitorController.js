@@ -1,5 +1,5 @@
 const Monitor = require('../models/Monitor');
-const { analyzeUrl } = require('../utils/urlAnalyzer');
+const { analyzeUrlHeuristics, calculateRiskScore } = require('../utils/urlAnalyzer');
 const { checkGoogleSafeBrowsing } = require('../services/googleSafeBrowsing');
 const { checkVirusTotal } = require('../services/virusTotal');
 const { sendEmail } = require('../services/emailService');
@@ -22,15 +22,16 @@ exports.addMonitor = async (req, res) => {
     }
 
     // Perform initial scan
-    const heuristicAnalysis = analyzeUrl(url);
+    const heuristics = analyzeUrlHeuristics(url);
     const googleResult = await checkGoogleSafeBrowsing(url);
     const virusTotalResult = await checkVirusTotal(url);
 
-    const riskScore = Math.round(
-      heuristicAnalysis.riskScore * 0.4 +
-      (googleResult.isSafe ? 0 : 40) +
-      (virusTotalResult.positives > 0 ? virusTotalResult.positives * 3 : 0)
-    );
+    const { score: riskScore } = calculateRiskScore({
+      heuristics,
+      googleResult,
+      virusTotalResult,
+      domainAge: null
+    });
 
     const monitor = new Monitor({
       user: req.user.id,
@@ -110,15 +111,16 @@ exports.checkMonitors = async () => {
       if (!shouldCheck) continue;
 
       // Perform scan
-      const heuristicAnalysis = analyzeUrl(monitor.url);
+      const heuristics = analyzeUrlHeuristics(monitor.url);
       const googleResult = await checkGoogleSafeBrowsing(monitor.url);
       const virusTotalResult = await checkVirusTotal(monitor.url);
 
-      const riskScore = Math.round(
-        heuristicAnalysis.riskScore * 0.4 +
-        (googleResult.isSafe ? 0 : 40) +
-        (virusTotalResult.positives > 0 ? virusTotalResult.positives * 3 : 0)
-      );
+      const { score: riskScore } = calculateRiskScore({
+        heuristics,
+        googleResult,
+        virusTotalResult,
+        domainAge: null
+      });
 
       const newStatus = riskScore < 30 ? 'safe' : riskScore < 70 ? 'suspicious' : 'dangerous';
       const statusChanged = newStatus !== monitor.lastStatus;

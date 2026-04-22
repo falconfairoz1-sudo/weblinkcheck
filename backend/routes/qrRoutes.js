@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const { scanQRCode } = require('../controllers/qrController');
-const { protect } = require('../middleware/auth');
+const { optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -21,6 +21,6 @@ const upload = multer({
 });
 
 // QR code scanning route (optional auth)
-router.post('/', upload.single('qrImage'), scanQRCode);
+router.post('/', optionalAuth, upload.single('qrImage'), scanQRCode);
 
 module.exports = router;
