@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkGuard Universal Extension Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007cba;
+        }
+        .test-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .test-links a {
+            padding: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            transition: background 0.2s;
+        }
+        .test-links a:hover {
+            background: #f0f0f0;
+        }
+        .status {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .instructions {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            color: #1565c0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛡️ LinkGuard Universal Extension Test Page</h1>
+    
+    <div class="instructions">
+        <h3>📋 Test Instructions</h3>
+        <ol>
+            <li><strong>Standalone Test:</strong> Open <code>linkguard-universal.html</code> in any browser</li>
+            <li><strong>Extension Test:</strong> Install the extension and visit this page</li>
+            <li><strong>Link Scanning:</strong> Watch for safety indicators next to links below</li>
+            <li><strong>Click Protection:</strong> Try clicking suspicious links to test blocking</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ Safe Links (Should show green indicators)</h2>
+        <div class="test-links">
+            <a href="https://google.com">Google - Safe Search Engine</a>
+            <a href="https://github.com">GitHub - Code Repository</a>
+            <a href="https://stackoverflow.com">Stack Overflow - Developer Community</a>
+            <a href="https://mozilla.org">Mozilla - Browser Foundation</a>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>⚠️ Potentially Suspicious Links (Should show yellow indicators)</h2>
+        <div class="test-links">
+            <a href="http://example.com">HTTP Site - Not Secure</a>
+            <a href="https://bit.ly/test">Bit.ly - URL Shortener</a>
+            <a href="https://tinyurl.com/test">TinyURL - URL Shortener</a>
+            <a href="https://sub1.sub2.sub3.example.com">Multiple Subdomains</a>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🛑 Simulated Dangerous Links (Should show red indicators)</h2>
+        <div class="warning">
+            <strong>Note:</strong> These are test URLs designed to trigger security warnings. They are not actually dangerous.
+        </div>
+        <div class="test-links">
+            <a href="https://phishing-test.example.com">Simulated Phishing Site</a>
+            <a href="https://malware-test.example.com">Simulated Malware Site</a>
+            <a href="http://192.168.1.1">IP Address Link</a>
+            <a href="https://suspicious-urgent-verify-account.example.com">Suspicious Keywords</a>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Extension Features to Test</h2>
+        <ul>
+            <li><strong>Visual Indicators:</strong> Look for colored indicators next to links</li>
+            <li><strong>Hover Tooltips:</strong> Hover over links to see detailed risk information</li>
+            <li><strong>Click Protection:</strong> Try clicking dangerous links to test blocking</li>
+            <li><strong>Popup Interface:</strong> Click the extension icon to open the popup</li>
+            <li><strong>Settings:</strong> Toggle protection settings in the popup</li>
+            <li><strong>Current Page Scan:</strong> Use "Scan This Page" button in popup</li>
+        </ul>
+    </div>
+
+    <div class="status" id="extensionStatus">
+        <strong>Extension Status:</strong> <span id="statusText">Checking...</span>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Quick Access</h2>
+        <p>
+            <a href="linkguard-universal.html" target="_blank" style="background: #007cba; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
+                Open Standalone Scanner
+            </a>
+        </p>
+    </div>
+
+    <script>
+        // Test if extension is loaded
+        function checkExtensionStatus() {
+            const statusText = document.getElementById('statusText');
+            
+            // Check for LinkGuard indicators or content script
+            setTimeout(() => {
+                const indicators = document.querySelectorAll('.linkguard-indicator, .linkguard-loading');
+                const hasExtension = indicators.length > 0 || 
+                                   document.getElementById('linkguard-styles') !== null;
+                
+                if (hasExtension) {
+                    statusText.textContent = '✅ Extension is working! Look for safety indicators next to links.';
+                    statusText.parentElement.style.background = '#e8f5e8';
+                    statusText.parentElement.style.borderColor = '#4caf50';
+                } else {
+                    statusText.textContent = '⚠️ Extension not detected. Try installing the extension or use the standalone scanner.';
+                    statusText.parentElement.style.background = '#fff3cd';
+                    statusText.parentElement.style.borderColor = '#ffc107';
+                }
+            }, 3000); // Wait 3 seconds for extension to process links
+        }
+
+        // Run status check when page loads
+        document.addEventListener('DOMContentLoaded', checkExtensionStatus);
+
+        // Add some dynamic links to test observer
+        setTimeout(() => {
+            const dynamicSection = document.createElement('div');
+            dynamicSection.className = 'test-section';
+            dynamicSection.innerHTML = `
+                <h2>🔄 Dynamically Added Links (Tests Observer)</h2>
+                <div class="test-links">
+                    <a href="https://dynamic-test.example.com">Dynamic Link 1</a>
+                    <a href="http://dynamic-insecure.example.com">Dynamic HTTP Link</a>
+                </div>
+            `;
+            document.body.appendChild(dynamicSection);
+        }, 2000);
+
+        console.log('LinkGuard Test Page Loaded');
+        console.log('Watch the console for extension activity');
+    </script>
+</body>
+</html>
