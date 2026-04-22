@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import HistoryList from '../components/HistoryList';
 import api from '../utils/api';
@@ -69,6 +69,64 @@ export default function History() {
     }
   };
 
+  const handlePDFDownload = async () => {
+    try {
+      console.log('Starting PDF download...');
+      
+      const response = await api.get('/report/pdf-history', {
+        responseType: 'blob',
+        timeout: 60000 // 60 seconds timeout
+      });
+      
+      console.log('PDF response received');
+      
+      // Create blob from response
+      const blob = new Blob([response.data], { 
+        type: 'application/pdf' 
+      });
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Generate filename with current date
+      const today = new Date().toISOString().split('T')[0];
+      link.download = `linkguard-scan-history-${today}.pdf`;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      console.log('PDF download completed');
+      
+    } catch (error) {
+      console.error('PDF download error:', error);
+      
+      let errorMessage = 'Failed to download PDF report';
+      
+      if (error.response) {
+        if (error.response.status === 404) {
+          errorMessage = 'No scan history found to export';
+        } else if (error.response.status === 401) {
+          errorMessage = 'Please login to download your scan history';
+        } else if (error.response.data?.error) {
+          errorMessage = error.response.data.error;
+        }
+      } else if (error.code === 'ECONNABORTED') {
+        errorMessage = 'Request timeout - please try again';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
+    }
+  };
+
   return (
     <div className="history-page">
       <div className="history-header">
@@ -83,28 +141,16 @@ export default function History() {
             <>
               <button 
                 className="btn-export-pdf"
-                onClick={async () => {
-                  try {
-                    const response = await api.get('/report/pdf-history', {
-                      responseType: 'blob'
-                    });
-                    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.setAttribute('download', `linkguard-scan-history-${new Date().toISOString().split('T')[0]}.pdf`);
-                    document.body.appendChild(link);
-                    link.click();
-                    link.remove();
-                    window.URL.revokeObjectURL(url);
-                  } catch (err) {
-                    console.error('PDF export error:', err);
-                    alert('Failed to export PDF: ' + (err.response?.data?.error || err.message));
-                  }
-                }}
+                onClick={handlePDFDownload}
+                disabled={loading}
               >
                 📄 Download PDF
               </button>
-              <button className="btn-clear-history" onClick={handleClearAll}>
+              <button 
+                className="btn-clear-history" 
+                onClick={handleClearAll}
+                disabled={loading}
+              >
                 🗑️ Clear All
               </button>
             </>

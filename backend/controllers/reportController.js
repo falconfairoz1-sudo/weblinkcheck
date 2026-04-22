@@ -2,7 +2,7 @@ const PDFDocument = require('pdfkit');
 const Scan = require('../models/Scan');
 
 /**
- * Generate PDF report for a scan
+ * Generate PDF report for a single scan
  */
 exports.generatePDFReport = async (req, res) => {
   try {
@@ -45,7 +45,7 @@ exports.generatePDFReport = async (req, res) => {
     
     const statusColor = scan.status === 'safe' ? '#10b981' : scan.status === 'suspicious' ? '#f59e0b' : '#ef4444';
     doc.fontSize(14).fillColor(statusColor).text(`Status: ${scan.status.toUpperCase()}`);
-    doc.fontSize(11).fillColor('#333').text(`Risk Score: ${scan.riskScore}/100`);
+    doc.fontSize(11).fillColor('#333').text(`Risk Score: ${scan.riskScore || 0}/100`);
     doc.moveDown();
 
     // Heuristic Analysis
@@ -65,7 +65,7 @@ exports.generatePDFReport = async (req, res) => {
     }
 
     // Google Safe Browsing
-    if (scan.googleSafeBrowsing) {
+    if (scan.googleSafeBrowsing && scan.googleSafeBrowsing.checked) {
       doc.fontSize(16).fillColor('#000').text('Google Safe Browsing', { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(11).fillColor('#333');
@@ -79,7 +79,7 @@ exports.generatePDFReport = async (req, res) => {
     }
 
     // VirusTotal
-    if (scan.virusTotal) {
+    if (scan.virusTotal && scan.virusTotal.checked) {
       doc.fontSize(16).fillColor('#000').text('VirusTotal Analysis', { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(11).fillColor('#333');
@@ -99,7 +99,8 @@ exports.generatePDFReport = async (req, res) => {
       doc.fontSize(11).fillColor('#ef4444');
       
       scan.warnings.forEach(warning => {
-        doc.text(`⚠️ ${warning.message || warning}`);
+        const message = typeof warning === 'string' ? warning : warning.message;
+        doc.text(`⚠️ ${message}`);
       });
       doc.moveDown();
     }
@@ -141,9 +142,13 @@ exports.generatePDFReport = async (req, res) => {
  */
 exports.generatePDFHistoryReport = async (req, res) => {
   try {
+    console.log('Generating PDF history report for user:', req.user._id);
+    
     const scans = await Scan.find({ userId: req.user._id })
       .sort({ createdAt: -1 })
-      .limit(500); // Limit to prevent huge PDFs
+      .limit(500);
+
+    console.log(`Found ${scans.length} scans for user`);
 
     if (scans.length === 0) {
       return res.status(404).json({ error: 'No scan history found' });
@@ -170,7 +175,7 @@ exports.generatePDFHistoryReport = async (req, res) => {
     const safeCount = scans.filter(s => s.status === 'safe').length;
     const suspiciousCount = scans.filter(s => s.status === 'suspicious').length;
     const maliciousCount = scans.filter(s => s.status === 'malicious').length;
-    const avgRiskScore = Math.round(scans.reduce((sum, s) => sum + (s.riskScore || 0), 0) / scans.length);
+    const avgRiskScore = scans.length > 0 ? Math.round(scans.reduce((sum, s) => sum + (s.riskScore || 0), 0) / scans.length) : 0;
 
     doc.fontSize(16).fillColor('#000').text('Summary Statistics', { underline: true });
     doc.moveDown(0.5);
@@ -187,9 +192,8 @@ exports.generatePDFHistoryReport = async (req, res) => {
     doc.moveDown(1);
 
     // Table setup
-    const tableTop = doc.y;
+    let currentY = doc.y;
     const itemHeight = 20;
-    let currentY = tableTop;
 
     // Table headers
     doc.fontSize(9).fillColor('#666');
@@ -270,6 +274,9 @@ exports.generatePDFHistoryReport = async (req, res) => {
 
     // Finalize PDF
     doc.end();
+    
+    console.log('PDF generation completed successfully');
+    
   } catch (error) {
     console.error('PDF history generation error:', error);
     res.status(500).json({ error: 'Failed to generate PDF history report' });
@@ -285,6 +292,10 @@ exports.generateCSVReport = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(1000);
 
+    if (scans.length === 0) {
+      return res.status(404).json({ error: 'No scan history found' });
+    }
+
     // CSV headers
     let csv = 'Date,URL,Status,Risk Score,Google Safe Browsing,VirusTotal Detections\n';
 
@@ -293,7 +304,7 @@ exports.generateCSVReport = async (req, res) => {
       const date = scan.createdAt.toISOString();
       const url = `"${scan.url.replace(/"/g, '""')}"`;
       const status = scan.status;
-      const riskScore = scan.riskScore;
+      const riskScore = scan.riskScore || 0;
       const googleSafe = scan.googleSafeBrowsing?.isSafe ? 'Safe' : 'Threat';
       const vtDetections = scan.virusTotal?.positives || 0;
 

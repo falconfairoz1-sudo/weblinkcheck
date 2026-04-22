@@ -1,8 +1,8 @@
 const express = require('express');
 const {
   generatePDFReport,
-  generatePDFHistoryReport,
-  generateCSVReport
+  generateCSVReport,
+  generatePDFHistoryReport
 } = require('../controllers/reportController');
 const { protect } = require('../middleware/auth');
 

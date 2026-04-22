@@ -17,7 +17,7 @@ const { errorHandler } = require('./middleware/errorHandler');
 const { startMonitorCron } = require('./jobs/monitorCron');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 dns.setServers(["1.1.1.1","8.8.8.8"]);
 
 // ─── Security Middleware ───────────────────────────────────────────────────────
