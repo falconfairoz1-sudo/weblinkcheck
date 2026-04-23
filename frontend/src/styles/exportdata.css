@@ -27,9 +27,15 @@
 /* Export Options */
 .export-options {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: var(--space-md);
   margin-bottom: var(--space-lg);
+}
+
+@media (min-width: 1024px) {
+  .export-options {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .export-option {
