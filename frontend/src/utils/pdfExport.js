@@ -1,27 +1,341 @@
 /**
- * Generate beautiful PDF from scan data
+ * Generate beautiful PDF from scan data using jsPDF
  */
 export const generatePDFReport = async (scanData, filename) => {
   try {
-    // Load html2pdf library
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    // Ensure jsPDF is loaded
+    if (!window.jspdf) {
+      await loadJsPDF();
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const scan = Array.isArray(scanData) ? scanData[0] : scanData;
     
-    script.onload = () => {
-      const element = createPDFContent(scanData);
-      const opt = {
-        margin: 10,
-        filename: `${filename}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-      };
-      
-      window.html2pdf().set(opt).from(element).save();
-      document.body.removeChild(element);
+    let yPos = 20;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const contentWidth = pageWidth - (margin * 2);
+
+    // Helper function to add text with word wrap
+    const addText = (text, x, y, maxWidth, fontSize = 10, color = [0, 0, 0]) => {
+      doc.setFontSize(fontSize);
+      doc.setTextColor(...color);
+      const lines = doc.splitTextToSize(text, maxWidth);
+      doc.text(lines, x, y);
+      return y + (lines.length * fontSize * 0.5);
     };
+
+    // Header with gradient effect (simulated with rectangles)
+    doc.setFillColor(79, 158, 255);
+    doc.rect(0, 0, pageWidth, 50, 'F');
     
-    document.head.appendChild(script);
+    // Shield emoji and title
+    doc.setFontSize(40);
+    doc.setTextColor(255, 255, 255);
+    doc.text('🛡️', pageWidth / 2, 25, { align: 'center' });
+    
+    doc.setFontSize(24);
+    doc.setFont(undefined, 'bold');
+    doc.text('LinkGuard Security Report', pageWidth / 2, 38, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text('Comprehensive URL Security Analysis', pageWidth / 2, 45, { align: 'center' });
+
+    yPos = 60;
+
+    // Generated date
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, yPos, { align: 'center' });
+    yPos += 15;
+
+    // Scanned URL Section
+    doc.setFillColor(248, 250, 252);
+    doc.rect(margin, yPos, contentWidth, 25, 'F');
+    
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(37, 99, 235);
+    doc.text('SCANNED URL', margin + 5, yPos + 8);
+    
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(75, 85, 99);
+    const urlLines = doc.splitTextToSize(scan.url || 'N/A', contentWidth - 10);
+    doc.text(urlLines, margin + 5, yPos + 16);
+    yPos += 35;
+
+    // Status and Risk Score
+    const boxWidth = (contentWidth - 10) / 2;
+    
+    // Status Box
+    doc.setFillColor(248, 250, 252);
+    doc.rect(margin, yPos, boxWidth, 30, 'F');
+    
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(37, 99, 235);
+    doc.text('STATUS', margin + 5, yPos + 8);
+    
+    // Status badge
+    const statusColors = {
+      safe: [16, 185, 129],
+      suspicious: [245, 158, 11],
+      malicious: [239, 68, 68]
+    };
+    const statusColor = statusColors[scan.status] || [100, 100, 100];
+    doc.setFillColor(...statusColor);
+    doc.roundedRect(margin + 5, yPos + 12, boxWidth - 10, 12, 3, 3, 'F');
+    
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text((scan.status || 'UNKNOWN').toUpperCase(), margin + boxWidth / 2, yPos + 20, { align: 'center' });
+
+    // Risk Score Box
+    doc.setFillColor(248, 250, 252);
+    doc.rect(margin + boxWidth + 10, yPos, boxWidth, 30, 'F');
+    
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(37, 99, 235);
+    doc.text('RISK SCORE', margin + boxWidth + 15, yPos + 8);
+    
+    // Risk score bar
+    const riskScore = scan.riskScore || 0;
+    const barWidth = boxWidth - 30;
+    const barHeight = 8;
+    
+    doc.setFillColor(229, 231, 235);
+    doc.roundedRect(margin + boxWidth + 15, yPos + 12, barWidth, barHeight, 2, 2, 'F');
+    
+    const riskColor = riskScore < 30 ? [16, 185, 129] : riskScore < 60 ? [245, 158, 11] : [239, 68, 68];
+    doc.setFillColor(...riskColor);
+    doc.roundedRect(margin + boxWidth + 15, yPos + 12, (barWidth * riskScore) / 100, barHeight, 2, 2, 'F');
+    
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(...riskColor);
+    doc.text(`${riskScore}/100`, margin + boxWidth + 15 + barWidth + 5, yPos + 18);
+    
+    yPos += 40;
+
+    // Domain and Scan Duration
+    doc.setFillColor(248, 250, 252);
+    doc.rect(margin, yPos, boxWidth, 20, 'F');
+    doc.rect(margin + boxWidth + 10, yPos, boxWidth, 20, 'F');
+    
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(37, 99, 235);
+    doc.text('DOMAIN', margin + 5, yPos + 8);
+    doc.text('SCAN DURATION', margin + boxWidth + 15, yPos + 8);
+    
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(75, 85, 99);
+    doc.text(scan.domain || 'N/A', margin + 5, yPos + 15);
+    doc.text(`${scan.scanDuration || 'N/A'}ms`, margin + boxWidth + 15, yPos + 15);
+    
+    yPos += 30;
+
+    // Warnings
+    if (scan.warnings && scan.warnings.length > 0) {
+      doc.setFillColor(255, 251, 235);
+      doc.setDrawColor(245, 158, 11);
+      doc.setLineWidth(2);
+      doc.rect(margin, yPos, contentWidth, 10 + (scan.warnings.length * 12), 'FD');
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(217, 119, 6);
+      doc.text(`⚠️ WARNINGS DETECTED (${scan.warnings.length})`, margin + 5, yPos + 7);
+      
+      yPos += 12;
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(146, 64, 14);
+      
+      scan.warnings.forEach((warning, idx) => {
+        doc.text(`• ${warning.type?.replace(/_/g, ' ') || 'Warning'}: ${warning.message}`, margin + 5, yPos + (idx * 12));
+      });
+      
+      yPos += (scan.warnings.length * 12) + 10;
+    }
+
+    // Security Checks
+    if (scan.heuristics) {
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(37, 99, 235);
+      doc.text('🔍 SECURITY CHECKS', margin, yPos);
+      yPos += 10;
+      
+      const checks = [
+        { label: 'HTTPS Protocol', value: scan.heuristics.hasHttps, good: true },
+        { label: 'URL Shortened', value: scan.heuristics.isShortened, good: false },
+        { label: 'IP-Based URL', value: scan.heuristics.isIpBased, good: false },
+        { label: 'Subdomain Abuse', value: scan.heuristics.hasSubdomainAbuse, good: false }
+      ];
+      
+      const checkBoxWidth = (contentWidth - 15) / 2;
+      let checkX = margin;
+      let checkY = yPos;
+      
+      checks.forEach((check, idx) => {
+        const isGood = check.good ? check.value : !check.value;
+        const bgColor = isGood ? [236, 253, 245] : [254, 242, 242];
+        const textColor = isGood ? [6, 95, 70] : [127, 29, 29];
+        
+        doc.setFillColor(...bgColor);
+        doc.rect(checkX, checkY, checkBoxWidth, 15, 'F');
+        
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(...textColor);
+        doc.text(check.label, checkX + 3, checkY + 6);
+        
+        doc.setFontSize(9);
+        doc.text(isGood ? '✅ Pass' : '❌ Fail', checkX + 3, checkY + 12);
+        
+        if (idx % 2 === 0) {
+          checkX += checkBoxWidth + 5;
+        } else {
+          checkX = margin;
+          checkY += 18;
+        }
+      });
+      
+      yPos = checkY + (checks.length % 2 === 0 ? 0 : 18) + 10;
+    }
+
+    // Check if we need a new page
+    if (yPos > 250) {
+      doc.addPage();
+      yPos = 20;
+    }
+
+    // API Results
+    if (scan.googleSafeBrowsing || scan.virusTotal) {
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(37, 99, 235);
+      doc.text('🔌 API SECURITY CHECKS', margin, yPos);
+      yPos += 10;
+      
+      if (scan.googleSafeBrowsing) {
+        const isSafe = scan.googleSafeBrowsing.isSafe;
+        doc.setFillColor(isSafe ? 236 : 254, isSafe ? 253 : 242, isSafe ? 245 : 242);
+        doc.rect(margin, yPos, contentWidth, 15, 'F');
+        
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(isSafe ? 6 : 127, isSafe ? 95 : 29, isSafe ? 70 : 29);
+        doc.text('Google Safe Browsing', margin + 3, yPos + 6);
+        
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(8);
+        doc.text(isSafe ? '✅ No threats detected' : '❌ Threats detected', margin + 3, yPos + 12);
+        yPos += 18;
+      }
+      
+      if (scan.virusTotal) {
+        const isSafe = scan.virusTotal.positives === 0;
+        doc.setFillColor(isSafe ? 236 : 254, isSafe ? 253 : 242, isSafe ? 245 : 242);
+        doc.rect(margin, yPos, contentWidth, 15, 'F');
+        
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(isSafe ? 6 : 127, isSafe ? 95 : 29, isSafe ? 70 : 29);
+        doc.text('VirusTotal', margin + 3, yPos + 6);
+        
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(8);
+        doc.text(`${scan.virusTotal.positives}/${scan.virusTotal.total} engines flagged`, margin + 3, yPos + 12);
+        yPos += 18;
+      }
+      
+      yPos += 5;
+    }
+
+    // AI Analysis
+    if (scan.aiAnalysis) {
+      if (yPos > 230) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFillColor(240, 247, 255);
+      doc.setDrawColor(79, 158, 255);
+      doc.setLineWidth(1);
+      doc.rect(margin, yPos, contentWidth, 40, 'FD');
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(37, 99, 235);
+      doc.text('🧠 AI ANALYSIS', margin + 5, yPos + 7);
+      
+      yPos += 12;
+      
+      // Phishing probability
+      doc.setFontSize(9);
+      doc.text('Phishing Probability:', margin + 5, yPos);
+      
+      const phishingProb = scan.aiAnalysis.phishingProbability || 0;
+      const probBarWidth = contentWidth - 50;
+      
+      doc.setFillColor(209, 213, 219);
+      doc.roundedRect(margin + 5, yPos + 3, probBarWidth, 6, 2, 2, 'F');
+      
+      const probColor = phishingProb < 30 ? [16, 185, 129] : phishingProb < 60 ? [245, 158, 11] : [239, 68, 68];
+      doc.setFillColor(...probColor);
+      doc.roundedRect(margin + 5, yPos + 3, (probBarWidth * phishingProb) / 100, 6, 2, 2, 'F');
+      
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...probColor);
+      doc.text(`${phishingProb}%`, margin + probBarWidth + 10, yPos + 7);
+      
+      yPos += 12;
+      
+      if (scan.aiAnalysis.explanation && scan.aiAnalysis.explanation.length > 0) {
+        doc.setFont(undefined, 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(37, 99, 235);
+        doc.text('Findings:', margin + 5, yPos);
+        yPos += 5;
+        
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(75, 85, 99);
+        scan.aiAnalysis.explanation.slice(0, 3).forEach((item, idx) => {
+          const lines = doc.splitTextToSize(`• ${item}`, contentWidth - 15);
+          doc.text(lines, margin + 8, yPos);
+          yPos += lines.length * 4;
+        });
+      }
+      
+      yPos += 10;
+    }
+
+    // Footer
+    const footerY = doc.internal.pageSize.getHeight() - 20;
+    doc.setDrawColor(229, 231, 235);
+    doc.setLineWidth(0.5);
+    doc.line(margin, footerY, pageWidth - margin, footerY);
+    
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(156, 163, 175);
+    doc.text('🛡️ LinkGuard Security Scanner', pageWidth / 2, footerY + 5, { align: 'center' });
+    
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(8);
+    doc.text('This report contains confidential security information. Please handle with care.', pageWidth / 2, footerY + 10, { align: 'center' });
+
+    // Save the PDF
+    doc.save(`${filename}.pdf`);
+    
   } catch (error) {
     console.error('PDF generation error:', error);
     throw error;
@@ -29,206 +343,19 @@ export const generatePDFReport = async (scanData, filename) => {
 };
 
 /**
- * Create beautiful PDF content structure
+ * Load jsPDF library dynamically
  */
-const createPDFContent = (data) => {
-  const container = document.createElement('div');
-  container.style.cssText = `
-    width: 210mm;
-    padding: 25px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: white;
-    color: #1a1a1a;
-    line-height: 1.6;
-  `;
+const loadJsPDF = () => {
+  return new Promise((resolve, reject) => {
+    if (window.jspdf) {
+      resolve();
+      return;
+    }
 
-  const scan = Array.isArray(data) ? data[0] : data;
-
-  container.innerHTML = `
-    <!-- Header -->
-    <div style="background: linear-gradient(135deg, #4F9EFF 0%, #2563EB 100%); color: white; padding: 35px; border-radius: 15px; margin-bottom: 35px; text-align: center; box-shadow: 0 8px 25px rgba(79, 158, 255, 0.3);">
-      <div style="font-size: 50px; margin-bottom: 15px;">🛡️</div>
-      <h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">LinkGuard Security Report</h1>
-      <p style="margin: 0; font-size: 14px; opacity: 0.95;">Comprehensive URL Security Analysis</p>
-      <p style="margin: 10px 0 0 0; font-size: 12px; opacity: 0.85;">Generated on ${new Date().toLocaleString()}</p>
-    </div>
-
-    <!-- Main Content -->
-    <div style="background: #f8fafc; padding: 25px; border-radius: 12px; margin-bottom: 25px;">
-      
-      <!-- URL Section -->
-      <div style="margin-bottom: 25px;">
-        <h2 style="color: #2563EB; font-size: 14px; margin: 0 0 12px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Scanned URL</h2>
-        <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #4F9EFF; word-break: break-all; font-size: 12px; color: #4b5563;">
-          ${scan.url || 'N/A'}
-        </div>
-      </div>
-
-      <!-- Status & Risk Score -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
-        <!-- Status -->
-        <div>
-          <h3 style="color: #2563EB; font-size: 12px; margin: 0 0 10px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Status</h3>
-          <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
-            <span style="padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 13px; display: inline-block; ${
-              scan.status === 'safe' 
-                ? 'background: #10b981; color: white;' 
-                : scan.status === 'suspicious'
-                ? 'background: #f59e0b; color: white;'
-                : 'background: #ef4444; color: white;'
-            }">
-              ${scan.status?.toUpperCase() || 'UNKNOWN'}
-            </span>
-          </div>
-        </div>
-
-        <!-- Risk Score -->
-        <div>
-          <h3 style="color: #2563EB; font-size: 12px; margin: 0 0 10px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Risk Score</h3>
-          <div style="background: white; padding: 15px; border-radius: 8px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <div style="flex: 1;">
-                <div style="width: 100%; height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden;">
-                  <div style="width: ${scan.riskScore || 0}%; height: 100%; background: linear-gradient(90deg, ${
-                    scan.riskScore < 30 ? '#10b981' : scan.riskScore < 60 ? '#f59e0b' : '#ef4444'
-                  }, ${
-                    scan.riskScore < 30 ? '#059669' : scan.riskScore < 60 ? '#d97706' : '#dc2626'
-                  });"></div>
-                </div>
-              </div>
-              <span style="font-size: 16px; font-weight: 800; color: ${
-                scan.riskScore < 30 ? '#10b981' : scan.riskScore < 60 ? '#f59e0b' : '#ef4444'
-              }; min-width: 45px; text-align: right;">${scan.riskScore || 0}/100</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Domain & Duration -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
-        <div>
-          <h3 style="color: #2563EB; font-size: 12px; margin: 0 0 8px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Domain</h3>
-          <div style="background: white; padding: 12px; border-radius: 8px; font-size: 12px; color: #4b5563;">${scan.domain || 'N/A'}</div>
-        </div>
-        <div>
-          <h3 style="color: #2563EB; font-size: 12px; margin: 0 0 8px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Scan Duration</h3>
-          <div style="background: white; padding: 12px; border-radius: 8px; font-size: 12px; color: #4b5563;">${scan.scanDuration || 'N/A'}ms</div>
-        </div>
-      </div>
-    </div>
-
-    ${scan.warnings && scan.warnings.length > 0 ? `
-      <!-- Warnings -->
-      <div style="background: #fffbeb; border-left: 5px solid #f59e0b; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
-        <h2 style="color: #d97706; font-size: 14px; margin: 0 0 15px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚠️ Warnings Detected (${scan.warnings.length})</h2>
-        <div style="display: grid; gap: 10px;">
-          ${scan.warnings.map(w => `
-            <div style="background: white; padding: 12px; border-radius: 8px; border-left: 3px solid #f59e0b;">
-              <p style="margin: 0 0 4px 0; font-weight: 600; font-size: 12px; color: #92400e;">${w.type.replace(/_/g, ' ')}</p>
-              <p style="margin: 0; font-size: 11px; color: #b45309;">${w.message}</p>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    ` : ''}
-
-    ${scan.heuristics ? `
-      <!-- Heuristics -->
-      <div style="margin-bottom: 25px;">
-        <h2 style="color: #2563EB; font-size: 14px; margin: 0 0 15px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔍 Security Checks</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div style="background: ${scan.heuristics.hasHttps ? '#ecfdf5' : '#fef2f2'}; padding: 12px; border-radius: 8px; border-left: 3px solid ${scan.heuristics.hasHttps ? '#10b981' : '#ef4444'};">
-            <p style="margin: 0 0 4px 0; font-weight: 600; font-size: 11px; color: ${scan.heuristics.hasHttps ? '#065f46' : '#7f1d1d'};">HTTPS Protocol</p>
-            <p style="margin: 0; font-size: 12px; font-weight: 700; color: ${scan.heuristics.hasHttps ? '#10b981' : '#ef4444'};">${scan.heuristics.hasHttps ? '✅ Yes' : '❌ No'}</p>
-          </div>
-          <div style="background: ${!scan.heuristics.isShortened ? '#ecfdf5' : '#fef2f2'}; padding: 12px; border-radius: 8px; border-left: 3px solid ${!scan.heuristics.isShortened ? '#10b981' : '#f59e0b'};">
-            <p style="margin: 0 0 4px 0; font-weight: 600; font-size: 11px; color: ${!scan.heuristics.isShortened ? '#065f46' : '#92400e'};">URL Shortened</p>
-            <p style="margin: 0; font-size: 12px; font-weight: 700; color: ${!scan.heuristics.isShortened ? '#10b981' : '#f59e0b'};">${!scan.heuristics.isShortened ? '✅ No' : '⚠️ Yes'}</p>
-          </div>
-          <div style="background: ${!scan.heuristics.isIpBased ? '#ecfdf5' : '#fef2f2'}; padding: 12px; border-radius: 8px; border-left: 3px solid ${!scan.heuristics.isIpBased ? '#10b981' : '#ef4444'};">
-            <p style="margin: 0 0 4px 0; font-weight: 600; font-size: 11px; color: ${!scan.heuristics.isIpBased ? '#065f46' : '#7f1d1d'};">IP-Based URL</p>
-            <p style="margin: 0; font-size: 12px; font-weight: 700; color: ${!scan.heuristics.isIpBased ? '#10b981' : '#ef4444'};">${!scan.heuristics.isIpBased ? '✅ No' : '❌ Yes'}</p>
-          </div>
-          <div style="background: ${!scan.heuristics.hasSubdomainAbuse ? '#ecfdf5' : '#fef2f2'}; padding: 12px; border-radius: 8px; border-left: 3px solid ${!scan.heuristics.hasSubdomainAbuse ? '#10b981' : '#ef4444'};">
-            <p style="margin: 0 0 4px 0; font-weight: 600; font-size: 11px; color: ${!scan.heuristics.hasSubdomainAbuse ? '#065f46' : '#7f1d1d'};">Subdomain Abuse</p>
-            <p style="margin: 0; font-size: 12px; font-weight: 700; color: ${!scan.heuristics.hasSubdomainAbuse ? '#10b981' : '#ef4444'};">${!scan.heuristics.hasSubdomainAbuse ? '✅ None' : '❌ Detected'}</p>
-          </div>
-        </div>
-      </div>
-    ` : ''}
-
-    ${scan.googleSafeBrowsing || scan.virusTotal ? `
-      <!-- API Results -->
-      <div style="margin-bottom: 25px;">
-        <h2 style="color: #2563EB; font-size: 14px; margin: 0 0 15px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔌 API Security Checks</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-          ${scan.googleSafeBrowsing ? `
-            <div style="background: ${scan.googleSafeBrowsing.isSafe ? '#ecfdf5' : '#fef2f2'}; padding: 15px; border-radius: 8px; border-left: 4px solid ${scan.googleSafeBrowsing.isSafe ? '#10b981' : '#ef4444'};">
-              <p style="margin: 0 0 8px 0; font-weight: 700; font-size: 12px; color: ${scan.googleSafeBrowsing.isSafe ? '#065f46' : '#7f1d1d'};">Google Safe Browsing</p>
-              <p style="margin: 0; font-size: 11px; color: ${scan.googleSafeBrowsing.isSafe ? '#047857' : '#991b1b'};">
-                ${scan.googleSafeBrowsing.isSafe ? '✅ No threats detected' : `❌ Threats: ${scan.googleSafeBrowsing.threats?.join(', ') || 'Unknown'}`}
-              </p>
-            </div>
-          ` : ''}
-          ${scan.virusTotal ? `
-            <div style="background: ${scan.virusTotal.positives === 0 ? '#ecfdf5' : '#fef2f2'}; padding: 15px; border-radius: 8px; border-left: 4px solid ${scan.virusTotal.positives === 0 ? '#10b981' : '#ef4444'};">
-              <p style="margin: 0 0 8px 0; font-weight: 700; font-size: 12px; color: ${scan.virusTotal.positives === 0 ? '#065f46' : '#7f1d1d'};">VirusTotal</p>
-              <p style="margin: 0; font-size: 11px; color: ${scan.virusTotal.positives === 0 ? '#047857' : '#991b1b'};">
-                ${scan.virusTotal.positives}/${scan.virusTotal.total} engines flagged
-              </p>
-            </div>
-          ` : ''}
-        </div>
-      </div>
-    ` : ''}
-
-    ${scan.aiAnalysis ? `
-      <!-- AI Analysis -->
-      <div style="background: linear-gradient(135deg, #f0f7ff 0%, #e0efff 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #4F9EFF; margin-bottom: 25px;">
-        <h2 style="color: #2563EB; font-size: 14px; margin: 0 0 15px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🧠 AI Analysis</h2>
-        
-        <div style="margin-bottom: 15px;">
-          <p style="margin: 0 0 8px 0; font-weight: 700; font-size: 12px; color: #2563EB;">Phishing Probability</p>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="flex: 1;">
-              <div style="width: 100%; height: 12px; background: #d1d5db; border-radius: 6px; overflow: hidden;">
-                <div style="width: ${scan.aiAnalysis.phishingProbability || 0}%; height: 100%; background: linear-gradient(90deg, ${
-                  scan.aiAnalysis.phishingProbability < 30 ? '#10b981' : 
-                  scan.aiAnalysis.phishingProbability < 60 ? '#f59e0b' : '#ef4444'
-                }, ${
-                  scan.aiAnalysis.phishingProbability < 30 ? '#059669' : 
-                  scan.aiAnalysis.phishingProbability < 60 ? '#d97706' : '#dc2626'
-                });"></div>
-              </div>
-            </div>
-            <span style="font-size: 14px; font-weight: 800; color: ${
-              scan.aiAnalysis.phishingProbability < 30 ? '#10b981' : 
-              scan.aiAnalysis.phishingProbability < 60 ? '#f59e0b' : '#ef4444'
-            }; min-width: 50px; text-align: right;">${scan.aiAnalysis.phishingProbability || 0}%</span>
-          </div>
-        </div>
-
-        ${scan.aiAnalysis.explanation && scan.aiAnalysis.explanation.length > 0 ? `
-          <div>
-            <p style="margin: 0 0 8px 0; font-weight: 700; font-size: 11px; color: #2563EB; text-transform: uppercase;">Findings:</p>
-            <ul style="margin: 0; padding-left: 18px; font-size: 11px; color: #4b5563;">
-              ${scan.aiAnalysis.explanation.map(item => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
-            </ul>
-          </div>
-        ` : ''}
-
-        <p style="margin: 12px 0 0 0; font-size: 10px; color: #6b7280;">
-          <strong>Confidence:</strong> ${scan.aiAnalysis.confidence?.toUpperCase() || 'N/A'}
-        </p>
-      </div>
-    ` : ''}
-
-    <!-- Footer -->
-    <div style="border-top: 2px solid #e5e7eb; padding-top: 15px; text-align: center; font-size: 10px; color: #9ca3af;">
-      <p style="margin: 0 0 5px 0; font-weight: 600;">🛡️ LinkGuard Security Scanner</p>
-      <p style="margin: 0;">This report contains confidential security information. Please handle with care.</p>
-    </div>
-  `;
-
-  return container;
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Failed to load jsPDF'));
+    document.head.appendChild(script);
+  });
 };

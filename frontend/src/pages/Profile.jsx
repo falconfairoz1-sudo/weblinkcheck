@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/ScanContext';
 import api from '../utils/api';
 import '../styles/profile.css';
 
 export default function Profile() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user, updateUser } = useAuth();
   const { addNotification } = useNotifications();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -16,6 +15,18 @@ export default function Profile() {
     newPassword: '',
     confirmPassword: ''
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        username: user.username,
+        email: user.email,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,6 +52,9 @@ export default function Profile() {
         newPassword: formData.newPassword
       });
 
+      // Update user context with new data
+      updateUser(response.data.user);
+      
       addNotification('Profile updated successfully', 'success');
       setIsEditing(false);
       setFormData(prev => ({
@@ -109,6 +123,7 @@ export default function Profile() {
                   value={formData.username}
                   onChange={handleInputChange}
                   className="form-input"
+                  required
                 />
               </div>
 
@@ -121,6 +136,7 @@ export default function Profile() {
                   value={formData.email}
                   onChange={handleInputChange}
                   className="form-input"
+                  required
                 />
               </div>
 
