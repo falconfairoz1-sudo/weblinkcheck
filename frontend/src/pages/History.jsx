@@ -15,6 +15,8 @@ export default function History() {
     search: ''
   });
 
+  const [pdfLoading, setPdfLoading] = useState(false);
+
   const fetchHistory = async (pageNum = 1, newFilters = filters) => {
     setLoading(true);
     try {
@@ -70,60 +72,172 @@ export default function History() {
   };
 
   const handlePDFDownload = async () => {
+    if (scans.length === 0) {
+      window.showNotification?.('No scans to export', 'warning');
+      return;
+    }
+
+    setPdfLoading(true);
+    window.showNotification?.('Generating PDF...', 'info');
+
     try {
-      console.log('Starting PDF download...');
-      
-      const response = await api.get('/report/pdf-history', {
-        responseType: 'blob',
-        timeout: 60000 // 60 seconds timeout
-      });
-      
-      console.log('PDF response received');
-      
-      // Create blob from response
-      const blob = new Blob([response.data], { 
-        type: 'application/pdf' 
-      });
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      
-      // Generate filename with current date
-      const today = new Date().toISOString().split('T')[0];
-      link.download = `linkguard-scan-history-${today}.pdf`;
-      
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      console.log('PDF download completed');
-      
-    } catch (error) {
-      console.error('PDF download error:', error);
-      
-      let errorMessage = 'Failed to download PDF report';
-      
-      if (error.response) {
-        if (error.response.status === 404) {
-          errorMessage = 'No scan history found to export';
-        } else if (error.response.status === 401) {
-          errorMessage = 'Please login to download your scan history';
-        } else if (error.response.data?.error) {
-          errorMessage = error.response.data.error;
-        }
-      } else if (error.code === 'ECONNABORTED') {
-        errorMessage = 'Request timeout - please try again';
-      } else if (error.message) {
-        errorMessage = error.message;
+      // Load jsPDF dynamically if not already loaded
+      if (!window.jspdf) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+          script.onload = resolve;
+          script.onerror = () => reject(new Error('Failed to load jsPDF'));
+          document.head.appendChild(script);
+        });
       }
-      
-      alert(errorMessage);
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 18;
+      const contentWidth = pageWidth - margin * 2;
+      let y = 0;
+
+      const checkPage = (needed = 10) => {
+        if (y + needed > pageHeight - 20) {
+          doc.addPage();
+          y = 20;
+        }
+      };
+
+      // ── Header ──────────────────────────────────────────────────────────────
+      doc.setFillColor(37, 99, 235);
+      doc.rect(0, 0, pageWidth, 44, 'F');
+      doc.setFontSize(20);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(255, 255, 255);
+      doc.text('LinkGuard — Scan History Report', pageWidth / 2, 20, { align: 'center' });
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Generated: ${new Date().toLocaleString()}   |   Total scans: ${scans.length}`, pageWidth / 2, 32, { align: 'center' });
+      if (user) {
+        doc.text(`User: ${user.username}`, pageWidth / 2, 40, { align: 'center' });
+      }
+      y = 54;
+
+      // ── Summary bar ─────────────────────────────────────────────────────────
+      const safe = scans.filter(s => s.status === 'safe').length;
+      const suspicious = scans.filter(s => s.status === 'suspicious').length;
+      const malicious = scans.filter(s => s.status === 'malicious').length;
+      const colW = (contentWidth - 6) / 3;
+
+      const summaryBoxes = [
+        { label: 'Safe', count: safe, color: [16, 185, 129] },
+        { label: 'Suspicious', count: suspicious, color: [245, 158, 11] },
+        { label: 'Malicious', count: malicious, color: [239, 68, 68] },
+      ];
+      summaryBoxes.forEach((box, i) => {
+        const bx = margin + i * (colW + 3);
+        doc.setFillColor(...box.color);
+        doc.roundedRect(bx, y, colW, 22, 3, 3, 'F');
+        doc.setFontSize(16);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(255, 255, 255);
+        doc.text(String(box.count), bx + colW / 2, y + 12, { align: 'center' });
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'normal');
+        doc.text(box.label, bx + colW / 2, y + 19, { align: 'center' });
+      });
+      y += 30;
+
+      // ── Table header ────────────────────────────────────────────────────────
+      const cols = { url: margin, status: margin + 90, risk: margin + 128, domain: margin + 152, date: margin + 118 };
+      // Adjusted columns: URL(85), Status(30), Risk(22), Domain(40), Date(rest)
+      const colWidths = [85, 30, 22, 40, contentWidth - 85 - 30 - 22 - 40 - 3];
+      const colX = [margin, margin + 85 + 2, margin + 85 + 30 + 4, margin + 85 + 30 + 22 + 6, margin + 85 + 30 + 22 + 40 + 8];
+
+      doc.setFillColor(37, 99, 235);
+      doc.rect(margin, y, contentWidth, 9, 'F');
+      doc.setFontSize(7.5);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(255, 255, 255);
+      const headers = ['URL', 'Status', 'Risk', 'Domain', 'Scanned At'];
+      headers.forEach((h, i) => doc.text(h, colX[i] + 1, y + 6));
+      y += 11;
+
+      // ── Table rows ──────────────────────────────────────────────────────────
+      const statusColors = {
+        safe: [16, 185, 129],
+        suspicious: [245, 158, 11],
+        malicious: [239, 68, 68],
+      };
+
+      scans.forEach((scan, idx) => {
+        checkPage(10);
+
+        // Alternating row background
+        if (idx % 2 === 0) {
+          doc.setFillColor(248, 250, 252);
+          doc.rect(margin, y - 1, contentWidth, 9, 'F');
+        }
+
+        doc.setFontSize(7);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(55, 65, 81);
+
+        // URL — truncate to fit
+        const urlText = (scan.url || '').length > 48 ? scan.url.substring(0, 45) + '...' : (scan.url || 'N/A');
+        doc.text(urlText, colX[0] + 1, y + 5);
+
+        // Status badge
+        const sc = statusColors[scan.status] || [100, 100, 100];
+        doc.setFillColor(...sc);
+        doc.roundedRect(colX[1], y, 26, 7, 1.5, 1.5, 'F');
+        doc.setFontSize(6.5);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(255, 255, 255);
+        doc.text((scan.status || 'N/A').toUpperCase(), colX[1] + 13, y + 5, { align: 'center' });
+
+        // Risk score
+        doc.setFontSize(7);
+        doc.setFont(undefined, 'bold');
+        const riskColor = scan.riskScore >= 60 ? [239, 68, 68] : scan.riskScore >= 30 ? [245, 158, 11] : [16, 185, 129];
+        doc.setTextColor(...riskColor);
+        doc.text(`${scan.riskScore ?? 'N/A'}`, colX[2] + 1, y + 5);
+
+        // Domain
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(55, 65, 81);
+        const domainText = (scan.domain || '').length > 22 ? scan.domain.substring(0, 19) + '...' : (scan.domain || 'N/A');
+        doc.text(domainText, colX[3] + 1, y + 5);
+
+        // Date
+        const dateStr = scan.createdAt ? new Date(scan.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
+        doc.text(dateStr, colX[4] + 1, y + 5);
+
+        y += 9;
+      });
+
+      // ── Footer ──────────────────────────────────────────────────────────────
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let p = 1; p <= totalPages; p++) {
+        doc.setPage(p);
+        doc.setDrawColor(229, 231, 235);
+        doc.setLineWidth(0.4);
+        doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14);
+        doc.setFontSize(7.5);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(156, 163, 175);
+        doc.text('🛡️ LinkGuard Security Scanner — Confidential', margin, pageHeight - 8);
+        doc.text(`Page ${p} of ${totalPages}`, pageWidth - margin, pageHeight - 8, { align: 'right' });
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+      doc.save(`linkguard-history-${today}.pdf`);
+      window.showNotification?.('PDF downloaded successfully', 'success');
+
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      window.showNotification?.('Failed to generate PDF: ' + error.message, 'error');
+    } finally {
+      setPdfLoading(false);
     }
   };
 
@@ -142,9 +256,9 @@ export default function History() {
               <button 
                 className="btn-export-pdf"
                 onClick={handlePDFDownload}
-                disabled={loading}
+                disabled={loading || pdfLoading}
               >
-                📄 Download PDF
+                {pdfLoading ? '⏳ Generating...' : '📄 Download PDF'}
               </button>
               <button 
                 className="btn-clear-history" 

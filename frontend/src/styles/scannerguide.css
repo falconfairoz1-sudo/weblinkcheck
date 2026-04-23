@@ -416,3 +416,260 @@ tbody tr:last-child td {
     font-size: 14px;
   }
 }
+
+/* ─── Security Tools Section ─────────────────────────────────────────────────── */
+.tools-section {
+  padding: 40px 20px;
+  background: var(--bg-secondary, #f8f9fa);
+}
+
+.tools-section h2 {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary, #1f2937);
+  margin: 0 0 8px 0;
+}
+
+.tools-intro {
+  text-align: center;
+  color: var(--text-secondary, #6b7280);
+  font-size: 15px;
+  margin: 0 0 28px 0;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.tool-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.tool-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(102, 126, 234, 0.18);
+  border-color: #667eea;
+}
+
+.tool-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tool-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.tool-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.tool-desc {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.tool-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+.tool-features li {
+  font-size: 12.5px;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tool-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: opacity 0.2s;
+  margin-top: auto;
+}
+
+.tool-link:hover {
+  opacity: 0.88;
+  color: white;
+}
+
+/* Dark mode overrides for tool cards */
+[data-theme="dark"] .tool-card {
+  background: var(--bg-card, #1f1f2a);
+  border-color: var(--border-primary, #2a2a38);
+}
+
+[data-theme="dark"] .tool-card:hover {
+  border-color: var(--text-accent, #4f9eff);
+  box-shadow: 0 10px 24px rgba(79, 158, 255, 0.15);
+}
+
+[data-theme="dark"] .tool-header h3 {
+  color: var(--text-primary, #f8f9fa);
+}
+
+[data-theme="dark"] .tool-desc {
+  color: var(--text-secondary, #b4b8c5);
+}
+
+[data-theme="dark"] .tool-features li {
+  color: var(--text-secondary, #b4b8c5);
+}
+
+[data-theme="dark"] .tools-section {
+  background: var(--bg-secondary, #16161d);
+}
+
+[data-theme="dark"] .tools-section h2 {
+  color: var(--text-primary, #f8f9fa);
+}
+
+/* Dark mode for existing sections */
+[data-theme="dark"] .scanner-guide-page {
+  background: var(--bg-primary, #0f0f14);
+}
+
+[data-theme="dark"] .scanner-selection h2,
+[data-theme="dark"] .comparison-section h2,
+[data-theme="dark"] .best-practices h2,
+[data-theme="dark"] .faq-section h2 {
+  color: var(--text-primary, #f8f9fa);
+}
+
+[data-theme="dark"] .scanner-btn {
+  background: var(--bg-card, #1f1f2a);
+  border-color: var(--border-primary, #2a2a38);
+  color: var(--text-primary, #f8f9fa);
+}
+
+[data-theme="dark"] .scanner-btn:hover {
+  border-color: #667eea;
+}
+
+[data-theme="dark"] .input-wrapper {
+  background: var(--bg-card, #1f1f2a);
+}
+
+[data-theme="dark"] .input-wrapper label {
+  color: var(--text-primary, #f8f9fa);
+}
+
+[data-theme="dark"] .url-input {
+  background: var(--bg-input, #252532);
+  border-color: var(--border-primary, #2a2a38);
+  color: var(--text-primary, #f8f9fa);
+}
+
+[data-theme="dark"] .btn-clear-input {
+  background: var(--bg-input, #252532);
+  border-color: var(--border-primary, #2a2a38);
+  color: var(--text-primary, #f8f9fa);
+}
+
+[data-theme="dark"] .comparison-table {
+  background: var(--bg-card, #1f1f2a);
+}
+
+[data-theme="dark"] td {
+  color: var(--text-secondary, #b4b8c5);
+  border-color: var(--border-primary, #2a2a38);
+}
+
+[data-theme="dark"] tbody tr:hover {
+  background: var(--bg-hover, #2a2a38);
+}
+
+[data-theme="dark"] .report-wrapper {
+  background: var(--bg-card, #1f1f2a);
+}
+
+[data-theme="dark"] .report-wrapper h2 {
+  color: var(--text-primary, #f8f9fa);
+}
+
+[data-theme="dark"] .practice-card {
+  background: var(--bg-card, #1f1f2a);
+  border-left-color: #667eea;
+}
+
+[data-theme="dark"] .practice-card h3 {
+  color: var(--text-primary, #f8f9fa);
+}
+
+[data-theme="dark"] .practice-card p {
+  color: var(--text-secondary, #b4b8c5);
+}
+
+[data-theme="dark"] .faq-item {
+  background: var(--bg-card, #1f1f2a);
+}
+
+[data-theme="dark"] .faq-item h3 {
+  color: var(--text-primary, #f8f9fa);
+}
+
+[data-theme="dark"] .faq-item p {
+  color: var(--text-secondary, #b4b8c5);
+}
+
+/* Responsive for tools grid */
+@media (max-width: 768px) {
+  .tools-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tools-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tools-section {
+    padding: 24px 12px;
+  }
+}

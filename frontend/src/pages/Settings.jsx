@@ -1,60 +1,45 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import api from '../utils/api';
 import '../styles/settings.css';
 
+const DEFAULTS = {
+  notifications: true,
+  emailAlerts: false,
+  autoSave: true,
+  scanHistory: true,
+  apiCaching: true,
+  advancedAnalytics: true,
+  exportFormat: 'pdf',
+  language: 'en',
+  timezone: 'auto'
+};
+
 export default function Settings() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { user } = useAuth();
-  const addNotification = (msg, type) => window.showNotification?.(msg, type);
+  const notify = (msg, type) => window.showNotification?.(msg, type);
+
   const [loading, setLoading] = useState(false);
-  const [preferences, setPreferences] = useState({
-    notifications: true,
-    emailAlerts: false,
-    darkMode: theme === 'dark',
-    autoSave: true,
-    scanHistory: true,
-    apiCaching: true,
-    advancedAnalytics: true,
-    exportFormat: 'pdf',
-    language: 'en',
-    timezone: 'auto'
+  const [preferences, setPreferences] = useState(() => {
+    // Load saved preferences from localStorage on first render
+    try {
+      const saved = localStorage.getItem('userPreferences');
+      return saved ? { ...DEFAULTS, ...JSON.parse(saved) } : { ...DEFAULTS };
+    } catch {
+      return { ...DEFAULTS };
+    }
   });
 
-  useEffect(() => {
-    setPreferences(prev => ({
-      ...prev,
-      darkMode: theme === 'dark'
-    }));
-  }, [theme]);
+  const set = (key, value) => setPreferences(prev => ({ ...prev, [key]: value }));
 
-  const handlePreferenceChange = (key, value) => {
-    setPreferences(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
-  const handleThemeChange = () => {
-    toggleTheme();
-  };
-
-  const handleSaveSettings = async () => {
+  const handleSaveSettings = () => {
     setLoading(true);
     try {
-      // Save to backend if user is logged in
-      if (user) {
-        await api.put('/auth/update-preferences', { preferences });
-      }
-      
-      // Save to localStorage
       localStorage.setItem('userPreferences', JSON.stringify(preferences));
-      
-      addNotification('Settings saved successfully', 'success');
-    } catch (error) {
-      console.error('Save settings error:', error);
-      addNotification('Failed to save settings', 'error');
+      notify('Settings saved successfully', 'success');
+    } catch {
+      notify('Failed to save settings', 'error');
     } finally {
       setLoading(false);
     }
@@ -62,12 +47,12 @@ export default function Settings() {
 
   const handleClearCache = () => {
     localStorage.removeItem('scanCache');
-    addNotification('Cache cleared successfully', 'success');
+    notify('Cache cleared successfully', 'success');
   };
 
   const handleExportData = () => {
     const data = {
-      user: user?.username,
+      user: user?.username || 'guest',
       preferences,
       exportDate: new Date().toISOString()
     };
@@ -78,7 +63,13 @@ export default function Settings() {
     link.download = `linkguard-settings-${Date.now()}.json`;
     link.click();
     URL.revokeObjectURL(url);
-    addNotification('Settings exported successfully', 'success');
+    notify('Settings exported successfully', 'success');
+  };
+
+  const handleReset = () => {
+    setPreferences({ ...DEFAULTS });
+    localStorage.removeItem('userPreferences');
+    notify('Settings reset to defaults', 'info');
   };
 
   return (
@@ -89,11 +80,12 @@ export default function Settings() {
       </div>
 
       <div className="settings-container">
-        {/* Account Settings */}
+
+        {/* ── Account Information ─────────────────────────────────────────── */}
         <section className="settings-section">
           <div className="section-header">
             <h2>👤 Account Information</h2>
-            <p>Manage your account details</p>
+            <p>Your account details</p>
           </div>
           <div className="settings-content">
             {user ? (
@@ -124,18 +116,20 @@ export default function Settings() {
                 </div>
               </div>
             ) : (
-              <p className="no-account">Please log in to view account settings</p>
+              <p className="no-account">Please log in to view account details</p>
             )}
           </div>
         </section>
 
-        {/* Appearance Settings */}
+        {/* ── Appearance ──────────────────────────────────────────────────── */}
         <section className="settings-section">
           <div className="section-header">
             <h2>🎨 Appearance</h2>
             <p>Customize the look and feel</p>
           </div>
           <div className="settings-content">
+
+            {/* Theme */}
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Theme Mode</h3>
@@ -145,14 +139,14 @@ export default function Settings() {
                 <div className="theme-selector">
                   <button
                     className={`theme-option ${theme === 'dark' ? 'active' : ''}`}
-                    onClick={handleThemeChange}
+                    onClick={() => setTheme('dark')}
                   >
                     <span className="theme-icon">🌙</span>
                     <span>Dark</span>
                   </button>
                   <button
                     className={`theme-option ${theme === 'light' ? 'active' : ''}`}
-                    onClick={handleThemeChange}
+                    onClick={() => setTheme('light')}
                   >
                     <span className="theme-icon">☀️</span>
                     <span>Light</span>
@@ -161,16 +155,17 @@ export default function Settings() {
               </div>
             </div>
 
+            {/* Language */}
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Language</h3>
                 <p>Select your preferred language</p>
               </div>
               <div className="preference-control">
-                <select 
+                <select
                   className="select-input"
                   value={preferences.language}
-                  onChange={(e) => handlePreferenceChange('language', e.target.value)}
+                  onChange={(e) => set('language', e.target.value)}
                 >
                   <option value="en">English</option>
                   <option value="es">Español</option>
@@ -181,16 +176,17 @@ export default function Settings() {
               </div>
             </div>
 
+            {/* Timezone */}
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Timezone</h3>
                 <p>Set your timezone for accurate timestamps</p>
               </div>
               <div className="preference-control">
-                <select 
+                <select
                   className="select-input"
                   value={preferences.timezone}
-                  onChange={(e) => handlePreferenceChange('timezone', e.target.value)}
+                  onChange={(e) => set('timezone', e.target.value)}
                 >
                   <option value="auto">Auto Detect</option>
                   <option value="UTC">UTC</option>
@@ -201,30 +197,36 @@ export default function Settings() {
                   <option value="Europe/London">London</option>
                   <option value="Europe/Paris">Paris</option>
                   <option value="Asia/Tokyo">Tokyo</option>
+                  <option value="Asia/Kolkata">India (IST)</option>
+                  <option value="Asia/Dubai">Dubai (GST)</option>
+                  <option value="Asia/Singapore">Singapore</option>
+                  <option value="Australia/Sydney">Sydney</option>
                 </select>
               </div>
             </div>
+
           </div>
         </section>
 
-        {/* Notification Settings */}
+        {/* ── Notifications ───────────────────────────────────────────────── */}
         <section className="settings-section">
           <div className="section-header">
             <h2>🔔 Notifications</h2>
             <p>Manage your notification preferences</p>
           </div>
           <div className="settings-content">
+
             <div className="preference-item">
               <div className="preference-info">
                 <h3>In-App Notifications</h3>
-                <p>Receive notifications for scan results and alerts</p>
+                <p>Show toast notifications for scan results and alerts</p>
               </div>
               <div className="preference-control">
                 <label className="toggle-switch">
                   <input
                     type="checkbox"
                     checked={preferences.notifications}
-                    onChange={(e) => handlePreferenceChange('notifications', e.target.checked)}
+                    onChange={(e) => set('notifications', e.target.checked)}
                   />
                   <span className="toggle-slider"></span>
                 </label>
@@ -234,40 +236,42 @@ export default function Settings() {
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Email Alerts</h3>
-                <p>Get email notifications for important security alerts</p>
+                <p>Receive email alerts when a monitored URL becomes dangerous</p>
               </div>
               <div className="preference-control">
                 <label className="toggle-switch">
                   <input
                     type="checkbox"
                     checked={preferences.emailAlerts}
-                    onChange={(e) => handlePreferenceChange('emailAlerts', e.target.checked)}
+                    onChange={(e) => set('emailAlerts', e.target.checked)}
                   />
                   <span className="toggle-slider"></span>
                 </label>
               </div>
             </div>
+
           </div>
         </section>
 
-        {/* Scanning Preferences */}
+        {/* ── Scanning Preferences ────────────────────────────────────────── */}
         <section className="settings-section">
           <div className="section-header">
             <h2>🔍 Scanning Preferences</h2>
-            <p>Configure scan behavior and features</p>
+            <p>Configure scan behaviour and features</p>
           </div>
           <div className="settings-content">
+
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Auto-Save Scans</h3>
-                <p>Automatically save your scan history</p>
+                <p>Automatically save scan results to your history</p>
               </div>
               <div className="preference-control">
                 <label className="toggle-switch">
                   <input
                     type="checkbox"
                     checked={preferences.autoSave}
-                    onChange={(e) => handlePreferenceChange('autoSave', e.target.checked)}
+                    onChange={(e) => set('autoSave', e.target.checked)}
                   />
                   <span className="toggle-slider"></span>
                 </label>
@@ -277,14 +281,14 @@ export default function Settings() {
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Scan History</h3>
-                <p>Keep a record of all your scans</p>
+                <p>Keep a record of all your past scans</p>
               </div>
               <div className="preference-control">
                 <label className="toggle-switch">
                   <input
                     type="checkbox"
                     checked={preferences.scanHistory}
-                    onChange={(e) => handlePreferenceChange('scanHistory', e.target.checked)}
+                    onChange={(e) => set('scanHistory', e.target.checked)}
                   />
                   <span className="toggle-slider"></span>
                 </label>
@@ -293,15 +297,15 @@ export default function Settings() {
 
             <div className="preference-item">
               <div className="preference-info">
-                <h3>API Caching</h3>
-                <p>Cache API results for faster repeated scans</p>
+                <h3>API Result Caching</h3>
+                <p>Cache scan results for 1 hour to speed up repeated scans</p>
               </div>
               <div className="preference-control">
                 <label className="toggle-switch">
                   <input
                     type="checkbox"
                     checked={preferences.apiCaching}
-                    onChange={(e) => handlePreferenceChange('apiCaching', e.target.checked)}
+                    onChange={(e) => set('apiCaching', e.target.checked)}
                   />
                   <span className="toggle-slider"></span>
                 </label>
@@ -311,14 +315,14 @@ export default function Settings() {
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Advanced Analytics</h3>
-                <p>Enable detailed security analysis and insights</p>
+                <p>Show detailed charts and threat breakdowns after each scan</p>
               </div>
               <div className="preference-control">
                 <label className="toggle-switch">
                   <input
                     type="checkbox"
                     checked={preferences.advancedAnalytics}
-                    onChange={(e) => handlePreferenceChange('advancedAnalytics', e.target.checked)}
+                    onChange={(e) => set('advancedAnalytics', e.target.checked)}
                   />
                   <span className="toggle-slider"></span>
                 </label>
@@ -328,35 +332,37 @@ export default function Settings() {
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Default Export Format</h3>
-                <p>Choose your preferred export format</p>
+                <p>Format used when exporting scan results</p>
               </div>
               <div className="preference-control">
-                <select 
+                <select
                   className="select-input"
                   value={preferences.exportFormat}
-                  onChange={(e) => handlePreferenceChange('exportFormat', e.target.value)}
+                  onChange={(e) => set('exportFormat', e.target.value)}
                 >
-                  <option value="pdf">PDF</option>
-                  <option value="json">JSON</option>
-                  <option value="csv">CSV</option>
-                  <option value="txt">TXT</option>
+                  <option value="pdf">PDF — Professional report</option>
+                  <option value="json">JSON — Structured data</option>
+                  <option value="csv">CSV — Spreadsheet</option>
+                  <option value="txt">TXT — Plain text</option>
                 </select>
               </div>
             </div>
+
           </div>
         </section>
 
-        {/* Privacy & Security */}
+        {/* ── Privacy & Security ──────────────────────────────────────────── */}
         <section className="settings-section">
           <div className="section-header">
             <h2>🔐 Privacy & Security</h2>
             <p>Manage your data and security settings</p>
           </div>
           <div className="settings-content">
+
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Data Encryption</h3>
-                <p>All your data is encrypted end-to-end</p>
+                <p>All data is encrypted in transit via HTTPS</p>
               </div>
               <div className="preference-control">
                 <span className="privacy-badge">✅ Enabled</span>
@@ -366,7 +372,7 @@ export default function Settings() {
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Data Privacy</h3>
-                <p>Your scan data is never shared with third parties</p>
+                <p>Your scan data is never sold or shared with third parties</p>
               </div>
               <div className="preference-control">
                 <span className="privacy-badge">✅ Protected</span>
@@ -376,7 +382,7 @@ export default function Settings() {
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Clear Cache</h3>
-                <p>Remove cached scan results and temporary data</p>
+                <p>Remove locally cached scan results and temporary data</p>
               </div>
               <div className="preference-control">
                 <button className="btn-secondary" onClick={handleClearCache}>
@@ -388,7 +394,7 @@ export default function Settings() {
             <div className="preference-item">
               <div className="preference-info">
                 <h3>Export Settings</h3>
-                <p>Download your settings and preferences</p>
+                <p>Download your current preferences as a JSON file</p>
               </div>
               <div className="preference-control">
                 <button className="btn-secondary" onClick={handleExportData}>
@@ -396,20 +402,21 @@ export default function Settings() {
                 </button>
               </div>
             </div>
+
           </div>
         </section>
 
-        {/* About */}
+        {/* ── About ───────────────────────────────────────────────────────── */}
         <section className="settings-section">
           <div className="section-header">
             <h2>ℹ️ About LinkGuard</h2>
-            <p>Application information and support</p>
+            <p>Application information</p>
           </div>
           <div className="settings-content">
             <div className="about-info">
               <div className="about-item">
                 <h3>Application</h3>
-                <p>LinkGuard - AI-Powered Link Safety Checker</p>
+                <p>LinkGuard — AI-Powered Link Safety Checker</p>
               </div>
               <div className="about-item">
                 <h3>Version</h3>
@@ -417,67 +424,41 @@ export default function Settings() {
               </div>
               <div className="about-item">
                 <h3>Security APIs</h3>
-                <p>Google Safe Browsing, VirusTotal, AI Heuristics</p>
+                <p>Google Safe Browsing · VirusTotal · AI Heuristics</p>
               </div>
               <div className="about-item">
                 <h3>Features</h3>
-                <p>URL Scanner, QR Scanner, Monitoring, Analytics, Reports</p>
+                <p>URL Scanner · QR Scanner · Monitor · Analytics · 7 Tools</p>
               </div>
               <div className="about-item">
                 <h3>Support</h3>
-                <p>
-                  <a href="mailto:support@linkguard.app">support@linkguard.app</a>
-                </p>
+                <p><a href="mailto:support@linkguard.app">support@linkguard.app</a></p>
               </div>
               <div className="about-item">
                 <h3>Documentation</h3>
-                <p>
-                  <a href="/scanner-guide">View User Guide</a>
-                </p>
+                <p><a href="/scanner-guide">View User Guide →</a></p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Save Button */}
+        {/* ── Save / Reset ────────────────────────────────────────────────── */}
         <div className="settings-actions">
-          <button 
-            className="btn-save" 
+          <button
+            className="btn-save"
             onClick={handleSaveSettings}
             disabled={loading}
           >
-            {loading ? (
-              <>
-                <span className="spinner"></span>
-                Saving...
-              </>
-            ) : (
-              <>
-                💾 Save Settings
-              </>
-            )}
+            {loading
+              ? <><span className="spinner"></span>Saving...</>
+              : '💾 Save Settings'
+            }
           </button>
-          <button 
-            className="btn-reset" 
-            onClick={() => {
-              setPreferences({
-                notifications: true,
-                emailAlerts: false,
-                darkMode: theme === 'dark',
-                autoSave: true,
-                scanHistory: true,
-                apiCaching: true,
-                advancedAnalytics: true,
-                exportFormat: 'pdf',
-                language: 'en',
-                timezone: 'auto'
-              });
-              addNotification('Settings reset to defaults', 'info');
-            }}
-          >
+          <button className="btn-reset" onClick={handleReset}>
             🔄 Reset to Defaults
           </button>
         </div>
+
       </div>
     </div>
   );

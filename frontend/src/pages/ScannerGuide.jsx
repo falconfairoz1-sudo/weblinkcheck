@@ -99,7 +99,7 @@ export default function ScannerGuide() {
       {/* Comparison Table */}
       <section className="comparison-section">
         <div className="container">
-          <h2>Scanner Comparison</h2>
+          <h2>Scanner & Tools Comparison</h2>
           <div className="comparison-table">
             <table>
               <thead>
@@ -108,59 +108,165 @@ export default function ScannerGuide() {
                   <th>URL Scanner</th>
                   <th>QR Scanner</th>
                   <th>Monitor</th>
+                  <th>URL Expander</th>
+                  <th>IP Lookup</th>
+                  <th>Domain Info</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>Real-time Scanning</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
+                  <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
                 </tr>
                 <tr>
                   <td>Malware Detection</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
+                  <td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td>
                 </tr>
                 <tr>
                   <td>Phishing Detection</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                </tr>
-                <tr>
-                  <td>Scam Detection</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
+                  <td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td>
                 </tr>
                 <tr>
                   <td>Continuous Monitoring</td>
-                  <td>❌</td>
-                  <td>❌</td>
-                  <td>✅</td>
+                  <td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td>
                 </tr>
                 <tr>
-                  <td>Alerts & Notifications</td>
-                  <td>❌</td>
-                  <td>❌</td>
-                  <td>✅</td>
+                  <td>Redirect Tracing</td>
+                  <td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td>
+                </tr>
+                <tr>
+                  <td>Geolocation Info</td>
+                  <td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td>
+                </tr>
+                <tr>
+                  <td>DNS Records</td>
+                  <td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td>
                 </tr>
                 <tr>
                   <td>Risk Scoring</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
+                  <td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td>
                 </tr>
                 <tr>
-                  <td>API Integration</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
+                  <td>Login Required</td>
+                  <td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Security Tools */}
+      <section className="tools-section">
+        <div className="container">
+          <h2>🛠️ Security Tools</h2>
+          <p className="tools-intro">Powerful tools to enhance your security analysis</p>
+          
+          <div className="tools-grid">
+            <div className="tool-card">
+              <div className="tool-header">
+                <span className="tool-icon">🔗</span>
+                <h3>URL Expander</h3>
+              </div>
+              <p className="tool-desc">Reveal the real destination behind shortened URLs (bit.ly, t.co, etc.)</p>
+              <ul className="tool-features">
+                <li>✓ Follows all redirects</li>
+                <li>✓ Shows final destination</li>
+                <li>✓ Detects shortened URLs</li>
+                <li>✓ One-click scan final URL</li>
+              </ul>
+              <a href="/tools/url-expander" className="tool-link">Try URL Expander →</a>
+            </div>
+
+            <div className="tool-card">
+              <div className="tool-header">
+                <span className="tool-icon">🌍</span>
+                <h3>IP & Domain Lookup</h3>
+              </div>
+              <p className="tool-desc">Get geolocation, ISP, and network info for any IP or domain</p>
+              <ul className="tool-features">
+                <li>✓ Country & city location</li>
+                <li>✓ ISP & organization</li>
+                <li>✓ Timezone & coordinates</li>
+                <li>✓ View on map</li>
+              </ul>
+              <a href="/tools/ip-lookup" className="tool-link">Try IP Lookup →</a>
+            </div>
+
+            <div className="tool-card">
+              <div className="tool-header">
+                <span className="tool-icon">⚖️</span>
+                <h3>URL Comparison</h3>
+              </div>
+              <p className="tool-desc">Compare two URLs side-by-side to see which is safer</p>
+              <ul className="tool-features">
+                <li>✓ Side-by-side analysis</li>
+                <li>✓ Risk score comparison</li>
+                <li>✓ Winner verdict</li>
+                <li>✓ Detailed metrics</li>
+              </ul>
+              <a href="/tools/compare" className="tool-link">Try Comparison →</a>
+            </div>
+
+            <div className="tool-card">
+              <div className="tool-header">
+                <span className="tool-icon">📡</span>
+                <h3>Live Threat Feed</h3>
+              </div>
+              <p className="tool-desc">Real-time feed of recently detected threats and scanned URLs</p>
+              <ul className="tool-features">
+                <li>✓ Live threat updates</li>
+                <li>✓ Auto-refresh mode</li>
+                <li>✓ Recent scans feed</li>
+                <li>✓ Risk score display</li>
+              </ul>
+              <a href="/tools/threat-feed" className="tool-link">View Threat Feed →</a>
+            </div>
+
+            <div className="tool-card">
+              <div className="tool-header">
+                <span className="tool-icon">🔖</span>
+                <h3>Bookmarks</h3>
+              </div>
+              <p className="tool-desc">Save URLs to your watchlist for quick scanning and monitoring</p>
+              <ul className="tool-features">
+                <li>✓ Save favorite URLs</li>
+                <li>✓ Quick scan access</li>
+                <li>✓ Custom labels</li>
+                <li>✓ One-click visit</li>
+              </ul>
+              <a href="/tools/bookmarks" className="tool-link">Manage Bookmarks →</a>
+            </div>
+
+            <div className="tool-card">
+              <div className="tool-header">
+                <span className="tool-icon">🔑</span>
+                <h3>Password Checker</h3>
+              </div>
+              <p className="tool-desc">Test password strength with 8-point analysis (nothing stored)</p>
+              <ul className="tool-features">
+                <li>✓ 8-point strength check</li>
+                <li>✓ Real-time feedback</li>
+                <li>✓ Security suggestions</li>
+                <li>✓ 100% private</li>
+              </ul>
+              <a href="/tools/password-checker" className="tool-link">Check Password →</a>
+            </div>
+
+            <div className="tool-card">
+              <div className="tool-header">
+                <span className="tool-icon">🌐</span>
+                <h3>Domain Info</h3>
+              </div>
+              <p className="tool-desc">Get DNS records, IP address, and security info for any domain</p>
+              <ul className="tool-features">
+                <li>✓ DNS records (A, MX, NS, TXT)</li>
+                <li>✓ IP address lookup</li>
+                <li>✓ TLD safety check</li>
+                <li>✓ Mail server info</li>
+              </ul>
+              <a href="/tools/domain-info" className="tool-link">Lookup Domain →</a>
+            </div>
           </div>
         </div>
       </section>
@@ -236,6 +342,21 @@ export default function ScannerGuide() {
             <div className="faq-item">
               <h3>Can I scan multiple URLs at once?</h3>
               <p>Yes! Use the Bulk Scanner feature in the URL Scanner to scan up to 10 URLs at once.</p>
+            </div>
+
+            <div className="faq-item">
+              <h3>What does the URL Expander do?</h3>
+              <p>It follows all redirects behind shortened links (bit.ly, t.co, etc.) and shows you the real final destination before you click. You can then scan that URL for threats.</p>
+            </div>
+
+            <div className="faq-item">
+              <h3>Is the Password Checker safe to use?</h3>
+              <p>Yes, completely. The password is sent to our server only to calculate its strength score — it is never stored, logged, or shared. The analysis happens instantly and is discarded.</p>
+            </div>
+
+            <div className="faq-item">
+              <h3>What information does the Domain Info tool show?</h3>
+              <p>It performs live DNS lookups to show A records (IP address), MX records (mail servers), NS records (name servers), TXT records, and flags suspicious TLDs.</p>
             </div>
           </div>
         </div>
