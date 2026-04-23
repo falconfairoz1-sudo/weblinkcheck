@@ -27,30 +27,7 @@ export default function Navbar() {
           <span className="logo-text">Link<span className="logo-accent">Guard</span></span>
         </Link>
 
-        {/* Desktop Nav */}
-        <div className="navbar-links">
-          <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
-            <span className="nav-icon">🔍</span>
-            Scanner
-          </Link>
-          <Link to="/qr-scanner" className={`nav-link ${isActive('/qr-scanner') ? 'active' : ''}`}>
-            <span className="nav-icon">📷</span>
-            QR Scanner
-          </Link>
-          <Link to="/monitor" className={`nav-link ${isActive('/monitor') ? 'active' : ''}`}>
-            Monitor
-          </Link>
-          <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}>
-            Dashboard
-          </Link>
-          <Link to="/history" className={`nav-link ${isActive('/history') ? 'active' : ''}`}>
-            History
-          </Link>
-          <Link to="/scanner-guide" className={`nav-link ${isActive('/scanner-guide') ? 'active' : ''}`}>
-            <span className="nav-icon">📚</span>
-            Guide
-          </Link>
-        </div>
+
 
         {/* Auth */}
         <div className="navbar-auth">
@@ -106,21 +83,18 @@ export default function Navbar() {
           <Link to="/dashboard" className="mobile-link" onClick={() => setMenuOpen(false)}>Dashboard</Link>
           <Link to="/history" className="mobile-link" onClick={() => setMenuOpen(false)}>History</Link>
           <Link to="/scanner-guide" className="mobile-link" onClick={() => setMenuOpen(false)}>📚 Guide</Link>
+          {!user && (
+            <>
+              <Link to="/login" className="mobile-link" onClick={() => setMenuOpen(false)}>Login</Link>
+              <Link to="/register" className="mobile-link" onClick={() => setMenuOpen(false)}>Sign Up</Link>
+            </>
+          )}
         </nav>
         <div className="mobile-menu-footer">
-          {user ? (
+          {user && (
             <button className="mobile-logout" onClick={handleLogout}>
-              Logout
+              🚪 Logout
             </button>
-          ) : (
-            <div className="mobile-auth-buttons">
-              <Link to="/login" className="mobile-btn-login" onClick={() => setMenuOpen(false)}>
-                Login
-              </Link>
-              <Link to="/register" className="mobile-btn-register" onClick={() => setMenuOpen(false)}>
-                Sign Up
-              </Link>
-            </div>
           )}
         </div>
       </div>

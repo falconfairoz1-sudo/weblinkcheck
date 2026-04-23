@@ -110,7 +110,7 @@
 
 /* Navigation Links */
 .navbar-links {
-  display: flex;
+  display: none;
   align-items: center;
   gap: var(--space-xl);
   flex: 1;
@@ -231,6 +231,12 @@
   gap: var(--space-md);
   padding: 0 var(--space-lg);
   border-left: 1px solid var(--border-primary);
+}
+
+@media (max-width: 768px) {
+  .auth-buttons {
+    display: none;
+  }
 }
 
 .btn-login {
@@ -359,7 +365,7 @@
 
 /* Mobile Menu */
 .hamburger {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 4px;
   background: none;
@@ -572,19 +578,17 @@
   
   .navbar-container {
     padding: 0 var(--space-md);
+    justify-content: center;
   }
   
-  .navbar-links,
-  .auth-buttons {
-    display: none;
+  .navbar-logo {
+    position: absolute;
+    left: var(--space-md);
   }
   
   .hamburger {
-    display: flex;
-  }
-  
-  .user-menu {
-    display: none;
+    position: absolute;
+    right: var(--space-md);
   }
   
   .mobile-menu {
