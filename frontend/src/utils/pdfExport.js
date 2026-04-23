@@ -35,7 +35,7 @@ const createPDFContent = (data) => {
   const container = document.createElement('div');
   container.style.cssText = `
     width: 210mm;
-    padding: 30px;
+    padding: 25px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: white;
     color: #1a1a1a;
@@ -45,29 +45,32 @@ const createPDFContent = (data) => {
   const scan = Array.isArray(data) ? data[0] : data;
 
   container.innerHTML = `
-    <!-- Header with Gradient Background -->
-    <div style="background: linear-gradient(135deg, #4F9EFF 0%, #2563EB 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; text-align: center; box-shadow: 0 4px 15px rgba(79, 158, 255, 0.3);">
-      <div style="font-size: 48px; margin-bottom: 15px;">🛡️</div>
-      <h1 style="margin: 0 0 10px 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">LinkGuard Security Report</h1>
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #4F9EFF 0%, #2563EB 100%); color: white; padding: 35px; border-radius: 15px; margin-bottom: 35px; text-align: center; box-shadow: 0 8px 25px rgba(79, 158, 255, 0.3);">
+      <div style="font-size: 50px; margin-bottom: 15px;">🛡️</div>
+      <h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">LinkGuard Security Report</h1>
       <p style="margin: 0; font-size: 14px; opacity: 0.95;">Comprehensive URL Security Analysis</p>
+      <p style="margin: 10px 0 0 0; font-size: 12px; opacity: 0.85;">Generated on ${new Date().toLocaleString()}</p>
     </div>
 
-    <!-- Scan Summary -->
-    <div style="margin-bottom: 30px;">
-      <h2 style="color: #2563EB; font-size: 18px; margin: 0 0 15px 0; font-weight: 700; border-bottom: 3px solid #4F9EFF; padding-bottom: 10px;">📋 Scan Summary</h2>
-      <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-        <tr style="background: #f0f7ff;">
-          <td style="padding: 14px; border: 1px solid #d0e4ff; font-weight: 700; width: 35%; color: #2563EB;">URL Scanned</td>
-          <td style="padding: 14px; border: 1px solid #d0e4ff; word-break: break-all; font-size: 12px;">${scan.url || 'N/A'}</td>
-        </tr>
-        <tr>
-          <td style="padding: 14px; border: 1px solid #d0e4ff; font-weight: 700; color: #2563EB;">Domain</td>
-          <td style="padding: 14px; border: 1px solid #d0e4ff;">${scan.domain || 'N/A'}</td>
-        </tr>
-        <tr style="background: #f0f7ff;">
-          <td style="padding: 14px; border: 1px solid #d0e4ff; font-weight: 700; color: #2563EB;">Status</td>
-          <td style="padding: 14px; border: 1px solid #d0e4ff;">
-            <span style="padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; ${
+    <!-- Main Content -->
+    <div style="background: #f8fafc; padding: 25px; border-radius: 12px; margin-bottom: 25px;">
+      
+      <!-- URL Section -->
+      <div style="margin-bottom: 25px;">
+        <h2 style="color: #2563EB; font-size: 14px; margin: 0 0 12px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Scanned URL</h2>
+        <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #4F9EFF; word-break: break-all; font-size: 12px; color: #4b5563;">
+          ${scan.url || 'N/A'}
+        </div>
+      </div>
+
+      <!-- Status & Risk Score -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+        <!-- Status -->
+        <div>
+          <h3 style="color: #2563EB; font-size: 12px; margin: 0 0 10px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Status</h3>
+          <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+            <span style="padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 13px; display: inline-block; ${
               scan.status === 'safe' 
                 ? 'background: #10b981; color: white;' 
                 : scan.status === 'suspicious'
@@ -76,43 +79,53 @@ const createPDFContent = (data) => {
             }">
               ${scan.status?.toUpperCase() || 'UNKNOWN'}
             </span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 14px; border: 1px solid #d0e4ff; font-weight: 700; color: #2563EB;">Risk Score</td>
-          <td style="padding: 14px; border: 1px solid #d0e4ff;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div style="width: 150px; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden;">
-                <div style="width: ${scan.riskScore || 0}%; height: 100%; background: ${
-                  scan.riskScore < 30 ? '#10b981' : scan.riskScore < 60 ? '#f59e0b' : '#ef4444'
-                };"></div>
+          </div>
+        </div>
+
+        <!-- Risk Score -->
+        <div>
+          <h3 style="color: #2563EB; font-size: 12px; margin: 0 0 10px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Risk Score</h3>
+          <div style="background: white; padding: 15px; border-radius: 8px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="flex: 1;">
+                <div style="width: 100%; height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden;">
+                  <div style="width: ${scan.riskScore || 0}%; height: 100%; background: linear-gradient(90deg, ${
+                    scan.riskScore < 30 ? '#10b981' : scan.riskScore < 60 ? '#f59e0b' : '#ef4444'
+                  }, ${
+                    scan.riskScore < 30 ? '#059669' : scan.riskScore < 60 ? '#d97706' : '#dc2626'
+                  });"></div>
+                </div>
               </div>
               <span style="font-size: 16px; font-weight: 800; color: ${
                 scan.riskScore < 30 ? '#10b981' : scan.riskScore < 60 ? '#f59e0b' : '#ef4444'
-              };">${scan.riskScore || 0}/100</span>
+              }; min-width: 45px; text-align: right;">${scan.riskScore || 0}/100</span>
             </div>
-          </td>
-        </tr>
-        <tr style="background: #f0f7ff;">
-          <td style="padding: 14px; border: 1px solid #d0e4ff; font-weight: 700; color: #2563EB;">Scan Duration</td>
-          <td style="padding: 14px; border: 1px solid #d0e4ff;">${scan.scanDuration || 'N/A'}ms</td>
-        </tr>
-        <tr>
-          <td style="padding: 14px; border: 1px solid #d0e4ff; font-weight: 700; color: #2563EB;">Scanned At</td>
-          <td style="padding: 14px; border: 1px solid #d0e4ff;">${new Date(scan.scannedAt).toLocaleString() || 'N/A'}</td>
-        </tr>
-      </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Domain & Duration -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+        <div>
+          <h3 style="color: #2563EB; font-size: 12px; margin: 0 0 8px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Domain</h3>
+          <div style="background: white; padding: 12px; border-radius: 8px; font-size: 12px; color: #4b5563;">${scan.domain || 'N/A'}</div>
+        </div>
+        <div>
+          <h3 style="color: #2563EB; font-size: 12px; margin: 0 0 8px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Scan Duration</h3>
+          <div style="background: white; padding: 12px; border-radius: 8px; font-size: 12px; color: #4b5563;">${scan.scanDuration || 'N/A'}ms</div>
+        </div>
+      </div>
     </div>
 
     ${scan.warnings && scan.warnings.length > 0 ? `
-      <!-- Warnings Section -->
-      <div style="margin-bottom: 30px;">
-        <h2 style="color: #d97706; font-size: 18px; margin: 0 0 15px 0; font-weight: 700; border-bottom: 3px solid #fbbf24; padding-bottom: 10px;">⚠️ Warnings (${scan.warnings.length})</h2>
-        <div style="background: #fffbeb; border-left: 5px solid #f59e0b; padding: 20px; border-radius: 8px;">
+      <!-- Warnings -->
+      <div style="background: #fffbeb; border-left: 5px solid #f59e0b; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+        <h2 style="color: #d97706; font-size: 14px; margin: 0 0 15px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚠️ Warnings Detected (${scan.warnings.length})</h2>
+        <div style="display: grid; gap: 10px;">
           ${scan.warnings.map(w => `
-            <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #fcd34d;">
-              <strong style="color: #92400e; font-size: 13px;">${w.type.replace(/_/g, ' ')}</strong>
-              <p style="margin: 6px 0 0 0; color: #b45309; font-size: 12px;">${w.message}</p>
+            <div style="background: white; padding: 12px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+              <p style="margin: 0 0 4px 0; font-weight: 600; font-size: 12px; color: #92400e;">${w.type.replace(/_/g, ' ')}</p>
+              <p style="margin: 0; font-size: 11px; color: #b45309;">${w.message}</p>
             </div>
           `).join('')}
         </div>
@@ -120,63 +133,47 @@ const createPDFContent = (data) => {
     ` : ''}
 
     ${scan.heuristics ? `
-      <!-- Heuristics Analysis -->
-      <div style="margin-bottom: 30px;">
-        <h2 style="color: #2563EB; font-size: 18px; margin: 0 0 15px 0; font-weight: 700; border-bottom: 3px solid #4F9EFF; padding-bottom: 10px;">🔍 Heuristics Analysis</h2>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-          <tr style="background: #f0f7ff;">
-            <td style="padding: 12px; border: 1px solid #d0e4ff; font-weight: 700; width: 50%; color: #2563EB;">Check</td>
-            <td style="padding: 12px; border: 1px solid #d0e4ff; font-weight: 700; color: #2563EB;">Result</td>
-          </tr>
-          <tr>
-            <td style="padding: 12px; border: 1px solid #d0e4ff;">HTTPS Protocol</td>
-            <td style="padding: 12px; border: 1px solid #d0e4ff; font-weight: 600;">${scan.heuristics.hasHttps ? '✅ Yes' : '❌ No'}</td>
-          </tr>
-          <tr style="background: #f0f7ff;">
-            <td style="padding: 12px; border: 1px solid #d0e4ff;">URL Shortened</td>
-            <td style="padding: 12px; border: 1px solid #d0e4ff; font-weight: 600;">${scan.heuristics.isShortened ? '⚠️ Yes' : '✅ No'}</td>
-          </tr>
-          <tr>
-            <td style="padding: 12px; border: 1px solid #d0e4ff;">IP-Based URL</td>
-            <td style="padding: 12px; border: 1px solid #d0e4ff; font-weight: 600;">${scan.heuristics.isIpBased ? '❌ Yes' : '✅ No'}</td>
-          </tr>
-          <tr style="background: #f0f7ff;">
-            <td style="padding: 12px; border: 1px solid #d0e4ff;">Subdomain Abuse</td>
-            <td style="padding: 12px; border: 1px solid #d0e4ff; font-weight: 600;">${scan.heuristics.hasSubdomainAbuse ? '❌ Detected' : '✅ None'}</td>
-          </tr>
-          <tr>
-            <td style="padding: 12px; border: 1px solid #d0e4ff;">Suspicious TLD</td>
-            <td style="padding: 12px; border: 1px solid #d0e4ff; font-weight: 600;">${scan.heuristics.hasSuspiciousTLD ? '⚠️ Yes' : '✅ No'}</td>
-          </tr>
-          <tr style="background: #f0f7ff;">
-            <td style="padding: 12px; border: 1px solid #d0e4ff;">Domain Length</td>
-            <td style="padding: 12px; border: 1px solid #d0e4ff;">${scan.heuristics.domainLength || 0} characters</td>
-          </tr>
-          <tr>
-            <td style="padding: 12px; border: 1px solid #d0e4ff;">URL Length</td>
-            <td style="padding: 12px; border: 1px solid #d0e4ff;">${scan.heuristics.urlLength || 0} characters</td>
-          </tr>
-        </table>
+      <!-- Heuristics -->
+      <div style="margin-bottom: 25px;">
+        <h2 style="color: #2563EB; font-size: 14px; margin: 0 0 15px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔍 Security Checks</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div style="background: ${scan.heuristics.hasHttps ? '#ecfdf5' : '#fef2f2'}; padding: 12px; border-radius: 8px; border-left: 3px solid ${scan.heuristics.hasHttps ? '#10b981' : '#ef4444'};">
+            <p style="margin: 0 0 4px 0; font-weight: 600; font-size: 11px; color: ${scan.heuristics.hasHttps ? '#065f46' : '#7f1d1d'};">HTTPS Protocol</p>
+            <p style="margin: 0; font-size: 12px; font-weight: 700; color: ${scan.heuristics.hasHttps ? '#10b981' : '#ef4444'};">${scan.heuristics.hasHttps ? '✅ Yes' : '❌ No'}</p>
+          </div>
+          <div style="background: ${!scan.heuristics.isShortened ? '#ecfdf5' : '#fef2f2'}; padding: 12px; border-radius: 8px; border-left: 3px solid ${!scan.heuristics.isShortened ? '#10b981' : '#f59e0b'};">
+            <p style="margin: 0 0 4px 0; font-weight: 600; font-size: 11px; color: ${!scan.heuristics.isShortened ? '#065f46' : '#92400e'};">URL Shortened</p>
+            <p style="margin: 0; font-size: 12px; font-weight: 700; color: ${!scan.heuristics.isShortened ? '#10b981' : '#f59e0b'};">${!scan.heuristics.isShortened ? '✅ No' : '⚠️ Yes'}</p>
+          </div>
+          <div style="background: ${!scan.heuristics.isIpBased ? '#ecfdf5' : '#fef2f2'}; padding: 12px; border-radius: 8px; border-left: 3px solid ${!scan.heuristics.isIpBased ? '#10b981' : '#ef4444'};">
+            <p style="margin: 0 0 4px 0; font-weight: 600; font-size: 11px; color: ${!scan.heuristics.isIpBased ? '#065f46' : '#7f1d1d'};">IP-Based URL</p>
+            <p style="margin: 0; font-size: 12px; font-weight: 700; color: ${!scan.heuristics.isIpBased ? '#10b981' : '#ef4444'};">${!scan.heuristics.isIpBased ? '✅ No' : '❌ Yes'}</p>
+          </div>
+          <div style="background: ${!scan.heuristics.hasSubdomainAbuse ? '#ecfdf5' : '#fef2f2'}; padding: 12px; border-radius: 8px; border-left: 3px solid ${!scan.heuristics.hasSubdomainAbuse ? '#10b981' : '#ef4444'};">
+            <p style="margin: 0 0 4px 0; font-weight: 600; font-size: 11px; color: ${!scan.heuristics.hasSubdomainAbuse ? '#065f46' : '#7f1d1d'};">Subdomain Abuse</p>
+            <p style="margin: 0; font-size: 12px; font-weight: 700; color: ${!scan.heuristics.hasSubdomainAbuse ? '#10b981' : '#ef4444'};">${!scan.heuristics.hasSubdomainAbuse ? '✅ None' : '❌ Detected'}</p>
+          </div>
+        </div>
       </div>
     ` : ''}
 
     ${scan.googleSafeBrowsing || scan.virusTotal ? `
-      <!-- API Checks -->
-      <div style="margin-bottom: 30px;">
-        <h2 style="color: #2563EB; font-size: 18px; margin: 0 0 15px 0; font-weight: 700; border-bottom: 3px solid #4F9EFF; padding-bottom: 10px;">🔌 API Security Checks</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+      <!-- API Results -->
+      <div style="margin-bottom: 25px;">
+        <h2 style="color: #2563EB; font-size: 14px; margin: 0 0 15px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔌 API Security Checks</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
           ${scan.googleSafeBrowsing ? `
-            <div style="padding: 15px; background: ${scan.googleSafeBrowsing.isSafe ? '#ecfdf5' : '#fef2f2'}; border-left: 5px solid ${scan.googleSafeBrowsing.isSafe ? '#10b981' : '#ef4444'}; border-radius: 8px;">
-              <strong style="color: ${scan.googleSafeBrowsing.isSafe ? '#065f46' : '#7f1d1d'}; font-size: 13px;">Google Safe Browsing</strong>
-              <p style="margin: 8px 0 0 0; font-size: 12px; color: ${scan.googleSafeBrowsing.isSafe ? '#047857' : '#991b1b'};">
+            <div style="background: ${scan.googleSafeBrowsing.isSafe ? '#ecfdf5' : '#fef2f2'}; padding: 15px; border-radius: 8px; border-left: 4px solid ${scan.googleSafeBrowsing.isSafe ? '#10b981' : '#ef4444'};">
+              <p style="margin: 0 0 8px 0; font-weight: 700; font-size: 12px; color: ${scan.googleSafeBrowsing.isSafe ? '#065f46' : '#7f1d1d'};">Google Safe Browsing</p>
+              <p style="margin: 0; font-size: 11px; color: ${scan.googleSafeBrowsing.isSafe ? '#047857' : '#991b1b'};">
                 ${scan.googleSafeBrowsing.isSafe ? '✅ No threats detected' : `❌ Threats: ${scan.googleSafeBrowsing.threats?.join(', ') || 'Unknown'}`}
               </p>
             </div>
           ` : ''}
           ${scan.virusTotal ? `
-            <div style="padding: 15px; background: ${scan.virusTotal.positives === 0 ? '#ecfdf5' : '#fef2f2'}; border-left: 5px solid ${scan.virusTotal.positives === 0 ? '#10b981' : '#ef4444'}; border-radius: 8px;">
-              <strong style="color: ${scan.virusTotal.positives === 0 ? '#065f46' : '#7f1d1d'}; font-size: 13px;">VirusTotal</strong>
-              <p style="margin: 8px 0 0 0; font-size: 12px; color: ${scan.virusTotal.positives === 0 ? '#047857' : '#991b1b'};">
+            <div style="background: ${scan.virusTotal.positives === 0 ? '#ecfdf5' : '#fef2f2'}; padding: 15px; border-radius: 8px; border-left: 4px solid ${scan.virusTotal.positives === 0 ? '#10b981' : '#ef4444'};">
+              <p style="margin: 0 0 8px 0; font-weight: 700; font-size: 12px; color: ${scan.virusTotal.positives === 0 ? '#065f46' : '#7f1d1d'};">VirusTotal</p>
+              <p style="margin: 0; font-size: 11px; color: ${scan.virusTotal.positives === 0 ? '#047857' : '#991b1b'};">
                 ${scan.virusTotal.positives}/${scan.virusTotal.total} engines flagged
               </p>
             </div>
@@ -187,43 +184,49 @@ const createPDFContent = (data) => {
 
     ${scan.aiAnalysis ? `
       <!-- AI Analysis -->
-      <div style="margin-bottom: 30px;">
-        <h2 style="color: #2563EB; font-size: 18px; margin: 0 0 15px 0; font-weight: 700; border-bottom: 3px solid #4F9EFF; padding-bottom: 10px;">🧠 AI Analysis</h2>
-        <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin-top: 15px;">
-          <p style="margin: 0 0 12px 0; font-weight: 700; font-size: 13px; color: #2563EB;">Phishing Probability</p>
-          <div style="width: 100%; height: 12px; background: #e5e7eb; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
-            <div style="width: ${scan.aiAnalysis.phishingProbability || 0}%; height: 100%; background: linear-gradient(90deg, ${
+      <div style="background: linear-gradient(135deg, #f0f7ff 0%, #e0efff 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #4F9EFF; margin-bottom: 25px;">
+        <h2 style="color: #2563EB; font-size: 14px; margin: 0 0 15px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🧠 AI Analysis</h2>
+        
+        <div style="margin-bottom: 15px;">
+          <p style="margin: 0 0 8px 0; font-weight: 700; font-size: 12px; color: #2563EB;">Phishing Probability</p>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="flex: 1;">
+              <div style="width: 100%; height: 12px; background: #d1d5db; border-radius: 6px; overflow: hidden;">
+                <div style="width: ${scan.aiAnalysis.phishingProbability || 0}%; height: 100%; background: linear-gradient(90deg, ${
+                  scan.aiAnalysis.phishingProbability < 30 ? '#10b981' : 
+                  scan.aiAnalysis.phishingProbability < 60 ? '#f59e0b' : '#ef4444'
+                }, ${
+                  scan.aiAnalysis.phishingProbability < 30 ? '#059669' : 
+                  scan.aiAnalysis.phishingProbability < 60 ? '#d97706' : '#dc2626'
+                });"></div>
+              </div>
+            </div>
+            <span style="font-size: 14px; font-weight: 800; color: ${
               scan.aiAnalysis.phishingProbability < 30 ? '#10b981' : 
               scan.aiAnalysis.phishingProbability < 60 ? '#f59e0b' : '#ef4444'
-            }, ${
-              scan.aiAnalysis.phishingProbability < 30 ? '#059669' : 
-              scan.aiAnalysis.phishingProbability < 60 ? '#d97706' : '#dc2626'
-            });"></div>
+            }; min-width: 50px; text-align: right;">${scan.aiAnalysis.phishingProbability || 0}%</span>
           </div>
-          <p style="margin: 0; font-size: 14px; font-weight: 800; color: ${
-            scan.aiAnalysis.phishingProbability < 30 ? '#10b981' : 
-            scan.aiAnalysis.phishingProbability < 60 ? '#f59e0b' : '#ef4444'
-          };">${scan.aiAnalysis.phishingProbability || 0}%</p>
         </div>
+
         ${scan.aiAnalysis.explanation && scan.aiAnalysis.explanation.length > 0 ? `
-          <div style="margin-top: 15px;">
-            <p style="margin: 0 0 10px 0; font-weight: 700; font-size: 13px; color: #2563EB;">Analysis Findings:</p>
-            <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: #4b5563;">
-              ${scan.aiAnalysis.explanation.map(item => `<li style="margin-bottom: 6px;">${item}</li>`).join('')}
+          <div>
+            <p style="margin: 0 0 8px 0; font-weight: 700; font-size: 11px; color: #2563EB; text-transform: uppercase;">Findings:</p>
+            <ul style="margin: 0; padding-left: 18px; font-size: 11px; color: #4b5563;">
+              ${scan.aiAnalysis.explanation.map(item => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
             </ul>
           </div>
         ` : ''}
-        <p style="margin: 15px 0 0 0; font-size: 12px; color: #6b7280;">
+
+        <p style="margin: 12px 0 0 0; font-size: 10px; color: #6b7280;">
           <strong>Confidence:</strong> ${scan.aiAnalysis.confidence?.toUpperCase() || 'N/A'}
         </p>
       </div>
     ` : ''}
 
     <!-- Footer -->
-    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #d0e4ff; text-align: center; font-size: 11px; color: #9ca3af;">
+    <div style="border-top: 2px solid #e5e7eb; padding-top: 15px; text-align: center; font-size: 10px; color: #9ca3af;">
       <p style="margin: 0 0 5px 0; font-weight: 600;">🛡️ LinkGuard Security Scanner</p>
-      <p style="margin: 0;">Generated on ${new Date().toLocaleString()}</p>
-      <p style="margin: 8px 0 0 0; font-size: 10px; color: #d1d5db;">This report contains confidential security information. Please handle with care.</p>
+      <p style="margin: 0;">This report contains confidential security information. Please handle with care.</p>
     </div>
   `;
 

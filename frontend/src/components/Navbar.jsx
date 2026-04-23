@@ -34,10 +34,10 @@ export default function Navbar() {
           <ThemeToggle />
           {user ? (
             <div className="user-menu">
-              <div className="user-info">
+              <Link to="/profile" className="user-info" title="View Profile">
                 <span className="user-avatar">👤</span>
                 <span className="user-name">{user.username}</span>
-              </div>
+              </Link>
               <button className="btn-logout" onClick={handleLogout} title="Logout">
                 🚪 Logout
               </button>
@@ -70,10 +70,10 @@ export default function Navbar() {
       <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
         <div className="mobile-menu-header">
           {user && (
-            <div className="mobile-user-info">
+            <Link to="/profile" className="mobile-user-info" onClick={() => setMenuOpen(false)}>
               <span className="mobile-user-avatar">👤</span>
               <span className="mobile-user-name">{user.username}</span>
-            </div>
+            </Link>
           )}
         </div>
         <nav className="mobile-nav-links">
