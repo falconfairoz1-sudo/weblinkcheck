@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../context/ScanContext';
+import api from '../utils/api';
 import '../styles/profile.css';
 
 export default function Profile() {
@@ -34,23 +35,12 @@ export default function Profile() {
     }
 
     try {
-      const response = await fetch('/api/auth/update-profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          currentPassword: formData.currentPassword,
-          newPassword: formData.newPassword
-        })
+      const response = await api.put('/auth/update-profile', {
+        username: formData.username,
+        email: formData.email,
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
-      }
 
       addNotification('Profile updated successfully', 'success');
       setIsEditing(false);
@@ -62,7 +52,8 @@ export default function Profile() {
       }));
     } catch (error) {
       console.error('Update error:', error);
-      addNotification('Error updating profile', 'error');
+      const errorMessage = error.response?.data?.error || 'Error updating profile';
+      addNotification(errorMessage, 'error');
     }
   };
 

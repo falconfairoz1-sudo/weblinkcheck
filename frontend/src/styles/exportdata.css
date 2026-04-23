@@ -27,14 +27,20 @@
 /* Export Options */
 .export-options {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-md);
   margin-bottom: var(--space-lg);
 }
 
-@media (min-width: 768px) {
+@media (max-width: 1024px) {
   .export-options {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .export-options {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -175,20 +181,12 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .export-options {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .option-label {
     padding: var(--space-md);
   }
 }
 
 @media (max-width: 480px) {
-  .export-options {
-    grid-template-columns: 1fr;
-  }
-
   .export-data {
     padding: var(--space-md);
   }

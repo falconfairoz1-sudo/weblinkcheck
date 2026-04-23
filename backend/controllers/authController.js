@@ -86,4 +86,59 @@ async function getMe(req, res) {
   res.json({ user: req.user });
 }
 
-module.exports = { register, login, getMe };
+/**
+ * PUT /api/auth/update-profile
+ */
+async function updateProfile(req, res, next) {
+  try {
+    const { username, email, currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    // Find user with password field
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // If changing password, verify current password
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ error: 'Current password is required to set a new password' });
+      }
+      const isPasswordValid = await user.comparePassword(currentPassword);
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: 'Current password is incorrect' });
+      }
+      user.password = newPassword;
+    }
+
+    // Update username if provided and different
+    if (username && username !== user.username) {
+      const existingUser = await User.findOne({ username });
+      if (existingUser) {
+        return res.status(409).json({ error: 'Username already taken' });
+      }
+      user.username = username;
+    }
+
+    // Update email if provided and different
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(409).json({ error: 'Email already registered' });
+      }
+      user.email = email;
+    }
+
+    await user.save();
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: { id: user._id, username: user.username, email: user.email, role: user.role }
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { register, login, getMe, updateProfile };
