@@ -122,6 +122,14 @@ async function scanUrl(req, res, next) {
       await scan.save();
       scanResult.scanId = scan._id;
 
+      // Increment user's totalScans counter
+      if (req.user?._id) {
+        const User = require('../models/User');
+        User.findByIdAndUpdate(req.user._id, { $inc: { totalScans: 1 } }).catch(err =>
+          console.error('totalScans increment error:', err)
+        );
+      }
+
       // Send high-risk alert email if authenticated and score is high
       if (req.user && score >= 70) {
         sendHighRiskAlert(req.user, scan).catch(err => 

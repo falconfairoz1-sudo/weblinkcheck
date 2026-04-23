@@ -36,7 +36,7 @@ async function register(req, res, next) {
     res.status(201).json({
       message: 'Account created successfully',
       token,
-      user: { id: user._id, username: user.username, email: user.email, role: user.role }
+      user: { id: user._id, username: user.username, email: user.email, role: user.role, totalScans: user.totalScans || 0, createdAt: user.createdAt }
     });
   } catch (error) {
     next(error);
@@ -72,7 +72,7 @@ async function login(req, res, next) {
     res.json({
       message: 'Login successful',
       token,
-      user: { id: user._id, username: user.username, email: user.email, role: user.role }
+      user: { id: user._id, username: user.username, email: user.email, role: user.role, totalScans: user.totalScans || 0, createdAt: user.createdAt }
     });
   } catch (error) {
     next(error);
@@ -82,8 +82,15 @@ async function login(req, res, next) {
 /**
  * GET /api/auth/me
  */
-async function getMe(req, res) {
-  res.json({ user: req.user });
+async function getMe(req, res, next) {
+  try {
+    // Always fetch fresh from DB so totalScans and other fields are current
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json({ user });
+  } catch (error) {
+    next(error);
+  }
 }
 
 /**
@@ -134,7 +141,7 @@ async function updateProfile(req, res, next) {
 
     res.json({
       message: 'Profile updated successfully',
-      user: { id: user._id, username: user.username, email: user.email, role: user.role }
+      user: { id: user._id, username: user.username, email: user.email, role: user.role, totalScans: user.totalScans || 0, createdAt: user.createdAt }
     });
   } catch (error) {
     next(error);
