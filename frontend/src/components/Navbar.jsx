@@ -4,22 +4,35 @@ import { useAuth } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
 import '../styles/navbar.css';
 
-const TOOLS = [
-  { path: '/tools/url-expander', icon: '🔗', label: 'URL Expander' },
-  { path: '/tools/ip-lookup', icon: '🌍', label: 'IP Lookup' },
-  { path: '/tools/compare', icon: '⚖️', label: 'URL Comparison' },
-  { path: '/tools/threat-feed', icon: '📡', label: 'Threat Feed' },
-  { path: '/tools/bookmarks', icon: '🔖', label: 'Bookmarks' },
-  { path: '/tools/password-checker', icon: '🔑', label: 'Password Checker' },
-  { path: '/tools/domain-info', icon: '🌐', label: 'Domain Info' },
-  { path: '/tools/ssl-checker', icon: '🔒', label: 'SSL Checker' },
-  { path: '/tools/email-headers', icon: '📧', label: 'Email Headers' },
-  { path: '/tools/subdomains', icon: '🔎', label: 'Subdomain Finder' },
-  { path: '/tools/ping', icon: '📡', label: 'Ping Tool' },
-  { path: '/tools/leaked-password', icon: '🔓', label: 'Leaked Password' },
-  { path: '/tools/phishing-quiz', icon: '🎯', label: 'Phishing Quiz' },
-  { path: '/tools/bulk-reputation', icon: '🏭', label: 'Bulk Reputation' },
+const TOOL_GROUPS = [
+  {
+    label: 'URL & Domain',
+    tools: [
+      { path: '/tools/url-expander',    icon: '🔗', label: 'URL Expander' },
+      { path: '/tools/compare',         icon: '⚖️', label: 'URL Comparison' },
+      { path: '/tools/ip-lookup',       icon: '🌍', label: 'IP Lookup' },
+      { path: '/tools/domain-info',     icon: '🌐', label: 'Domain Info' },
+      { path: '/tools/ssl-checker',     icon: '🔒', label: 'SSL Checker' },
+      { path: '/tools/subdomains',      icon: '🔎', label: 'Subdomain Finder' },
+      { path: '/tools/ping',            icon: '📡', label: 'Ping Tool' },
+      { path: '/tools/bulk-reputation', icon: '🏭', label: 'Bulk Reputation' },
+    ]
+  },
+  {
+    label: 'Security & Privacy',
+    tools: [
+      { path: '/tools/threat-feed',      icon: '📡', label: 'Threat Feed' },
+      { path: '/tools/password-checker', icon: '🔑', label: 'Password Checker' },
+      { path: '/tools/leaked-password',  icon: '🔓', label: 'Leaked Password' },
+      { path: '/tools/email-headers',    icon: '📧', label: 'Email Headers' },
+      { path: '/tools/phishing-quiz',    icon: '🎯', label: 'Phishing Quiz' },
+      { path: '/tools/bookmarks',        icon: '🔖', label: 'Bookmarks' },
+    ]
+  }
 ];
+
+// Flat list for mobile
+const ALL_TOOLS = TOOL_GROUPS.flatMap(g => g.tools);
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -79,7 +92,7 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Tools Dropdown */}
+          {/* Tools Mega-Menu */}
           <div className={`nav-dropdown-wrap ${isToolsActive() ? 'active' : ''}`} ref={toolsRef}>
             <button
               className={`nav-link nav-dropdown-trigger ${isToolsActive() ? 'active' : ''}`}
@@ -89,18 +102,30 @@ export default function Navbar() {
               <span className="dropdown-arrow">{toolsOpen ? '▲' : '▼'}</span>
             </button>
             {toolsOpen && (
-              <div className="nav-dropdown-menu">
-                {TOOLS.map((tool) => (
-                  <Link
-                    key={tool.path}
-                    to={tool.path}
-                    className="nav-dropdown-item"
-                    onClick={() => setToolsOpen(false)}
-                  >
-                    <span>{tool.icon}</span>
-                    {tool.label}
+              <div className="nav-mega-menu">
+                <div className="mega-menu-inner">
+                  {TOOL_GROUPS.map((group) => (
+                    <div key={group.label} className="mega-menu-group">
+                      <div className="mega-menu-group-label">{group.label}</div>
+                      {group.tools.map((tool) => (
+                        <Link
+                          key={tool.path}
+                          to={tool.path}
+                          className={`mega-menu-item ${isActive(tool.path) ? 'active' : ''}`}
+                          onClick={() => setToolsOpen(false)}
+                        >
+                          <span className="mega-item-icon">{tool.icon}</span>
+                          <span className="mega-item-label">{tool.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+                <div className="mega-menu-footer">
+                  <Link to="/scanner-guide#tools" className="mega-view-all" onClick={() => setToolsOpen(false)}>
+                    📖 View all tools in Guide →
                   </Link>
-                ))}
+                </div>
               </div>
             )}
           </div>
@@ -182,7 +207,7 @@ export default function Navbar() {
           )}
           <div className="mobile-divider"></div>
           <div className="mobile-section-label">🛠️ Tools</div>
-          {TOOLS.map((tool) => (
+          {ALL_TOOLS.map((tool) => (
             <Link key={tool.path} to={tool.path} className="mobile-link mobile-tool-link" onClick={() => setMenuOpen(false)}>
               {tool.icon} {tool.label}
             </Link>
