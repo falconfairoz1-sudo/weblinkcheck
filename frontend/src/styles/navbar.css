@@ -578,17 +578,26 @@
   
   .navbar-container {
     padding: 0 var(--space-md);
-    justify-content: center;
+    justify-content: space-between;
   }
   
   .navbar-logo {
-    position: absolute;
-    left: var(--space-md);
+    position: static;
+  }
+  
+  .navbar-auth {
+    position: static;
+    gap: var(--space-md);
+    border-left: none;
+    padding: 0;
   }
   
   .hamburger {
-    position: absolute;
-    right: var(--space-md);
+    position: static;
+  }
+  
+  .user-menu {
+    display: none;
   }
   
   .mobile-menu {
