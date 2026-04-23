@@ -51,8 +51,18 @@ export function AuthProvider({ children }) {
     setUser(userData);
   };
 
+  // Re-fetch fresh user data from server (e.g. after a scan to update totalScans)
+  const refreshUser = async () => {
+    try {
+      const res = await api.get('/auth/me');
+      setUser(res.data.user);
+    } catch {
+      // silently ignore — user stays as-is
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

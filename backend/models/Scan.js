@@ -80,6 +80,11 @@ const scanSchema = new mongoose.Schema(
       safe: { type: Number, default: 0 },
       unsafe: { type: Number, default: 0 }
     },
+    notes: [{
+      text: { type: String, maxlength: 500 },
+      addedAt: { type: Date, default: Date.now },
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+    }],
     // User association (optional)
     userId: {
       type: mongoose.Schema.Types.ObjectId,

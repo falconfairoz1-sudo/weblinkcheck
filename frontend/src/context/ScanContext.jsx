@@ -1,9 +1,11 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import api from '../utils/api';
+import { useAuth } from './AuthContext';
 
 const ScanContext = createContext(null);
 
 export function ScanProvider({ children }) {
+  const { user, refreshUser } = useAuth();
   const [currentScan, setCurrentScan] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState(null);
@@ -15,6 +17,8 @@ export function ScanProvider({ children }) {
     try {
       const res = await api.post('/scan', { url });
       setCurrentScan(res.data);
+      // Refresh user so totalScans updates everywhere instantly
+      if (user) refreshUser();
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.error ||
@@ -32,6 +36,8 @@ export function ScanProvider({ children }) {
     setError(null);
     try {
       const res = await api.post('/scan/bulk', { urls });
+      // Refresh user after bulk scan too
+      if (user) refreshUser();
       return res.data;
     } catch (err) {
       const msg = err.response?.data?.error || 'Bulk scan failed.';

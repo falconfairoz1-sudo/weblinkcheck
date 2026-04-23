@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getStatusColor, getStatusIcon, getStatusLabel, getRiskColor, getSeverityColor, formatDate, truncateUrl } from '../utils/helpers';
 import RiskGauge from './RiskGauge';
 import CommunityVotes from './CommunityVotes';
+import ScanNotes from './ScanNotes';
 import '../styles/resultcard.css';
 
 export default function ResultCard({ result }) {
@@ -220,6 +221,9 @@ export default function ResultCard({ result }) {
 
       {/* Community Votes */}
       {scanId && <CommunityVotes scanId={scanId} />}
+
+      {/* Scan Notes */}
+      {scanId && <ScanNotes scanId={scanId} />}
     </div>
   );
 }

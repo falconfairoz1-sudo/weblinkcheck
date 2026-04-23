@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import api from '../utils/api';
 import AdvancedAnalytics from '../components/AdvancedAnalytics';
 import ScanStreak from '../components/ScanStreak';
+import ActivityHeatmap from '../components/ActivityHeatmap';
 import { getStatusColor, getStatusIcon, formatDate } from '../utils/helpers';
 import '../styles/dashboard.css';
 
@@ -76,6 +77,11 @@ export default function Dashboard() {
           {/* Scan Streak */}
           <div className="dashboard-section">
             <ScanStreak />
+          </div>
+
+          {/* Activity Heatmap */}
+          <div className="dashboard-section">
+            <ActivityHeatmap />
           </div>
 
           {/* Advanced Analytics */}

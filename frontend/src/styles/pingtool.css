@@ -1,0 +1,40 @@
+.ping-page{max-width:700px;margin:0 auto;padding:2rem 1rem}
+.ping-header{text-align:center;margin-bottom:2rem}
+.ping-icon{font-size:3rem;display:block;margin-bottom:.5rem}
+.ping-header h1{font-size:2rem;font-weight:700;margin:0 0 .5rem}
+.ping-header p{color:var(--text-secondary);margin:0}
+.ping-card{background:var(--bg-card);border:1px solid var(--border-primary);border-radius:16px;padding:2rem;margin-bottom:2rem}
+.ping-form{display:flex;flex-direction:column;gap:1rem}
+.ping-input-wrap{display:flex;align-items:center;background:var(--bg-input);border:1px solid var(--border-primary);border-radius:10px;padding:0 1rem;gap:.5rem}
+.ping-input{flex:1;background:none;border:none;outline:none;padding:.9rem 0;font-size:1rem;color:var(--text-primary)}
+.ping-btn{background:var(--gradient-primary);color:#fff;border:none;border-radius:10px;padding:.9rem 2rem;font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:opacity .2s}
+.ping-btn:hover:not(:disabled){opacity:.9}
+.ping-btn:disabled{opacity:.6;cursor:not-allowed}
+.ping-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:8px;padding:.75rem 1rem;margin-top:1rem}
+.ping-result{margin-top:1.5rem;border-top:1px solid var(--border-primary);padding-top:1.5rem;display:flex;flex-direction:column;gap:1rem}
+.ping-status-banner{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border-radius:12px;border:1px solid}
+.ping-status-banner.reachable{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.3)}
+.ping-status-banner.unreachable{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.3)}
+.ping-status-icon{font-size:1.5rem}
+.ping-status-banner strong{display:block;font-size:1rem;color:var(--text-primary)}
+.ping-status-banner p{margin:0;font-size:.875rem;color:var(--text-secondary)}
+.ping-latency{font-size:1.5rem;font-weight:800;margin-left:auto}
+.ping-details{display:flex;flex-direction:column;gap:0}
+.ping-row{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--border-primary)}
+.ping-row:last-child{border-bottom:none}
+.ping-row-label{font-size:.875rem;color:var(--text-secondary)}
+.ping-row-value{font-size:.875rem;font-weight:600;color:var(--text-primary)}
+.ping-protocols h3{margin:0 0 .75rem;font-size:.95rem;font-weight:700}
+.ping-protocol{display:flex;align-items:center;gap:1rem;padding:.6rem .75rem;background:var(--bg-input);border-radius:8px;margin-bottom:.4rem}
+.ping-protocol.ok{border-left:3px solid #10b981}
+.ping-protocol.fail{border-left:3px solid #ef4444}
+.protocol-name{font-size:.8rem;font-weight:700;text-transform:uppercase;color:var(--text-secondary);width:50px}
+.protocol-status{flex:1;font-size:.875rem;font-weight:600;color:var(--text-primary)}
+.protocol-latency{font-size:.8rem;color:var(--text-secondary)}
+.ping-examples{background:var(--bg-card);border:1px solid var(--border-primary);border-radius:16px;padding:1.5rem}
+.ping-examples h3{margin:0 0 1rem;font-size:1rem;font-weight:600}
+.ping-chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.ping-chip{background:var(--bg-input);border:1px solid var(--border-primary);border-radius:20px;padding:.4rem 1rem;font-size:.875rem;cursor:pointer;color:var(--text-primary);transition:all .2s}
+.ping-chip:hover{background:var(--gradient-primary);color:#fff;border-color:transparent}
+.btn-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}

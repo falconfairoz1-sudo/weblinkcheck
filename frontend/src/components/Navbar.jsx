@@ -12,6 +12,13 @@ const TOOLS = [
   { path: '/tools/bookmarks', icon: '🔖', label: 'Bookmarks' },
   { path: '/tools/password-checker', icon: '🔑', label: 'Password Checker' },
   { path: '/tools/domain-info', icon: '🌐', label: 'Domain Info' },
+  { path: '/tools/ssl-checker', icon: '🔒', label: 'SSL Checker' },
+  { path: '/tools/email-headers', icon: '📧', label: 'Email Headers' },
+  { path: '/tools/subdomains', icon: '🔎', label: 'Subdomain Finder' },
+  { path: '/tools/ping', icon: '📡', label: 'Ping Tool' },
+  { path: '/tools/leaked-password', icon: '🔓', label: 'Leaked Password' },
+  { path: '/tools/phishing-quiz', icon: '🎯', label: 'Phishing Quiz' },
+  { path: '/tools/bulk-reputation', icon: '🏭', label: 'Bulk Reputation' },
 ];
 
 export default function Navbar() {

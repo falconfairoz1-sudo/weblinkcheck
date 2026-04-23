@@ -14,6 +14,7 @@ const qrRoutes = require('./routes/qrRoutes');
 const monitorRoutes = require('./routes/monitorRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const toolsRoutes = require('./routes/toolsRoutes');
+const advancedRoutes = require('./routes/advancedRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 const { startMonitorCron } = require('./jobs/monitorCron');
 
@@ -66,6 +67,7 @@ app.use('/api/qr', qrRoutes);
 app.use('/api/monitor', monitorRoutes);
 app.use('/api/report', reportRoutes);
 app.use('/api/tools', toolsRoutes);
+app.use('/api/advanced', advancedRoutes);
 
 
 

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import api from '../utils/api';
 import '../styles/settings.css';
 
 const DEFAULTS = {
@@ -18,17 +17,14 @@ const DEFAULTS = {
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, refreshUser } = useAuth();
   const notify = (msg, type) => window.showNotification?.(msg, type);
 
   const [loading, setLoading] = useState(false);
 
-  // Refresh user from server on mount to get latest totalScans
+  // Fetch fresh user data on mount so totalScans is always current
   useEffect(() => {
-    if (!user) return;
-    api.get('/auth/me')
-      .then(res => updateUser(res.data.user))
-      .catch(() => {});
+    if (user) refreshUser();
   }, []);
   const [preferences, setPreferences] = useState(() => {
     // Load saved preferences from localStorage on first render

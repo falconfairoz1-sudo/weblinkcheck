@@ -1,0 +1,37 @@
+.subdomain-page{max-width:700px;margin:0 auto;padding:2rem 1rem}
+.subdomain-header{text-align:center;margin-bottom:2rem}
+.subdomain-icon{font-size:3rem;display:block;margin-bottom:.5rem}
+.subdomain-header h1{font-size:2rem;font-weight:700;margin:0 0 .5rem}
+.subdomain-header p{color:var(--text-secondary);margin:0}
+.subdomain-card{background:var(--bg-card);border:1px solid var(--border-primary);border-radius:16px;padding:2rem;margin-bottom:1.5rem}
+.subdomain-form{display:flex;flex-direction:column;gap:1rem}
+.subdomain-input-wrap{display:flex;align-items:center;background:var(--bg-input);border:1px solid var(--border-primary);border-radius:10px;padding:0 1rem;gap:.5rem}
+.subdomain-input{flex:1;background:none;border:none;outline:none;padding:.9rem 0;font-size:1rem;color:var(--text-primary)}
+.subdomain-btn{background:var(--gradient-primary);color:#fff;border:none;border-radius:10px;padding:.9rem 2rem;font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:opacity .2s}
+.subdomain-btn:hover:not(:disabled){opacity:.9}
+.subdomain-btn:disabled{opacity:.6;cursor:not-allowed}
+.subdomain-progress{text-align:center;padding:1rem 0}
+.progress-bar-wrap{height:4px;background:var(--bg-input);border-radius:2px;overflow:hidden;margin-bottom:.75rem}
+.progress-bar-fill{height:100%;background:var(--gradient-primary);border-radius:2px;animation:progress 2s ease-in-out infinite}
+@keyframes progress{0%{width:0;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0;margin-left:100%}}
+.subdomain-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:8px;padding:.75rem 1rem;margin-top:1rem}
+.subdomain-result{margin-top:1.5rem;border-top:1px solid var(--border-primary);padding-top:1.5rem}
+.subdomain-summary{display:flex;gap:1.5rem;margin-bottom:1.5rem}
+.summary-stat{text-align:center}
+.summary-num{display:block;font-size:1.5rem;font-weight:800;color:var(--text-primary)}
+.summary-label{font-size:.75rem;color:var(--text-secondary);text-transform:uppercase}
+.subdomain-empty{text-align:center;padding:2rem;color:var(--text-secondary)}
+.subdomain-empty span{font-size:2rem;display:block;margin-bottom:.5rem}
+.subdomain-list{display:flex;flex-direction:column;gap:.5rem}
+.subdomain-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg-input);border-radius:10px;border:1px solid var(--border-primary)}
+.subdomain-status-dot{width:8px;height:8px;background:#10b981;border-radius:50%;flex-shrink:0}
+.subdomain-info{flex:1}
+.subdomain-name{display:block;font-size:.9rem;font-weight:600;color:var(--text-primary)}
+.subdomain-ip{display:block;font-size:.75rem;color:var(--text-secondary)}
+.subdomain-visit{color:var(--text-accent);font-size:.8rem;font-weight:600;text-decoration:none}
+.subdomain-visit:hover{text-decoration:underline}
+.subdomain-note{display:flex;align-items:flex-start;gap:.75rem;background:var(--bg-card);border:1px solid var(--border-primary);border-radius:12px;padding:1rem 1.25rem}
+.subdomain-note span{font-size:1.2rem;flex-shrink:0}
+.subdomain-note p{margin:0;font-size:.875rem;color:var(--text-secondary)}
+.btn-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}

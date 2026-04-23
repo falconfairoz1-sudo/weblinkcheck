@@ -23,6 +23,13 @@ import ThreatFeed from './pages/ThreatFeed';
 import Bookmarks from './pages/Bookmarks';
 import PasswordChecker from './pages/PasswordChecker';
 import DomainInfo from './pages/DomainInfo';
+import SSLChecker from './pages/SSLChecker';
+import EmailHeaderAnalyzer from './pages/EmailHeaderAnalyzer';
+import SubdomainFinder from './pages/SubdomainFinder';
+import PingTool from './pages/PingTool';
+import LeakedPasswordCheck from './pages/LeakedPasswordCheck';
+import PhishingQuiz from './pages/PhishingQuiz';
+import BulkDomainReputation from './pages/BulkDomainReputation';
 
 export default function App() {
   return (
@@ -52,6 +59,13 @@ export default function App() {
                 <Route path="/tools/bookmarks" element={<Bookmarks />} />
                 <Route path="/tools/password-checker" element={<PasswordChecker />} />
                 <Route path="/tools/domain-info" element={<DomainInfo />} />
+                <Route path="/tools/ssl-checker" element={<SSLChecker />} />
+                <Route path="/tools/email-headers" element={<EmailHeaderAnalyzer />} />
+                <Route path="/tools/subdomains" element={<SubdomainFinder />} />
+                <Route path="/tools/ping" element={<PingTool />} />
+                <Route path="/tools/leaked-password" element={<LeakedPasswordCheck />} />
+                <Route path="/tools/phishing-quiz" element={<PhishingQuiz />} />
+                <Route path="/tools/bulk-reputation" element={<BulkDomainReputation />} />
               </Routes>
             </main>
           </div>
