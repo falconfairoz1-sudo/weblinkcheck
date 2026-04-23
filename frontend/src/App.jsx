@@ -15,6 +15,7 @@ import Monitor from './pages/Monitor';
 import QRScanner from './pages/QRScanner';
 import ScannerGuide from './pages/ScannerGuide';
 import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
                 <Route path="/qr-scanner" element={<QRScanner />} />
                 <Route path="/scanner-guide" element={<ScannerGuide />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />      
               </Routes>

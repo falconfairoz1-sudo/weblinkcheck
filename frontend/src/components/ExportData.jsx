@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { generatePDFReport } from '../utils/pdfExport';
 import '../styles/exportdata.css';
 
 export default function ExportData({ scanData }) {
   const [exportFormat, setExportFormat] = useState('json');
   const [isExporting, setIsExporting] = useState(false);
 
-  const handleExport = () => {
+  const handleExport = async () => {
     setIsExporting(true);
 
     try {
@@ -24,6 +25,10 @@ export default function ExportData({ scanData }) {
         content = convertToTXT(scanData);
         filename += '.txt';
         mimeType = 'text/plain';
+      } else if (exportFormat === 'pdf') {
+        await generatePDFReport(scanData, filename);
+        setIsExporting(false);
+        return;
       }
 
       const blob = new Blob([content], { type: mimeType });
@@ -138,6 +143,23 @@ export default function ExportData({ scanData }) {
             <span className="option-text">
               <span className="option-name">TXT</span>
               <span className="option-desc">Plain text format</span>
+            </span>
+          </span>
+        </label>
+
+        <label className="export-option">
+          <input
+            type="radio"
+            name="format"
+            value="pdf"
+            checked={exportFormat === 'pdf'}
+            onChange={(e) => setExportFormat(e.target.value)}
+          />
+          <span className="option-label">
+            <span className="option-icon">📕</span>
+            <span className="option-text">
+              <span className="option-name">PDF</span>
+              <span className="option-desc">Professional report</span>
             </span>
           </span>
         </label>

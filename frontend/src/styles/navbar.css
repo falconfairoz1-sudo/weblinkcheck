@@ -587,7 +587,7 @@
   
   .navbar-auth {
     position: static;
-    gap: var(--space-md);
+    gap: var(--space-xs);
     border-left: none;
     padding: 0;
   }

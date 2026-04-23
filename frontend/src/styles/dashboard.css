@@ -192,6 +192,7 @@
   gap: var(--space-lg);
   text-decoration: none;
   transition: all var(--transition-fast);
+  overflow: hidden;
 }
 
 .recent-scan-item:hover {
@@ -220,15 +221,19 @@
 .scan-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
 }
 
 .scan-url {
   color: var(--text-primary);
   font-weight: 500;
-  margin-bottom: var(--space-xs);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 .scan-meta {
@@ -237,12 +242,26 @@
   gap: var(--space-md);
   font-size: 0.875rem;
   color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.scan-domain {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+.scan-date {
+  flex-shrink: 0;
 }
 
 .scan-risk {
   font-weight: 700;
   font-size: 1.125rem;
   flex-shrink: 0;
+  min-width: 60px;
+  text-align: right;
 }
 
 .no-scans {
@@ -379,20 +398,71 @@
   }
   
   .recent-scan-item {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     gap: var(--space-md);
+    padding: var(--space-md);
   }
   
+  .scan-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .scan-url {
+    font-size: 0.95rem;
+  }
+
+  .scan-domain {
+    max-width: 150px;
+  }
+
   .scan-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-xs);
+    flex-direction: row;
+    gap: var(--space-sm);
+  }
+
+  .scan-risk {
+    min-width: 50px;
+    font-size: 1rem;
   }
   
   .quick-actions,
   .security-tips {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .recent-scan-item {
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .scan-status-icon {
+    font-size: 1.25rem;
+  }
+
+  .scan-url {
+    font-size: 0.9rem;
+  }
+
+  .scan-meta {
+    font-size: 0.75rem;
+    gap: var(--space-xs);
+  }
+
+  .scan-domain {
+    max-width: 120px;
+  }
+
+  .scan-risk {
+    min-width: 45px;
+    font-size: 0.9rem;
   }
 }
 
