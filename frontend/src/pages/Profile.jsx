@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNotifications } from '../context/ScanContext';
 import api from '../utils/api';
 import '../styles/profile.css';
 
 export default function Profile() {
   const { user, updateUser } = useAuth();
-  const { addNotification } = useNotifications();
+  const addNotification = (msg, type) => window.showNotification?.(msg, type);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     username: user?.username || '',

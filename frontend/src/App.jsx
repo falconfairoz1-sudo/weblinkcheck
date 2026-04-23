@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ScanProvider } from './context/ScanContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -16,7 +16,13 @@ import QRScanner from './pages/QRScanner';
 import ScannerGuide from './pages/ScannerGuide';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
-
+import UrlExpander from './pages/UrlExpander';
+import IpLookup from './pages/IpLookup';
+import UrlComparison from './pages/UrlComparison';
+import ThreatFeed from './pages/ThreatFeed';
+import Bookmarks from './pages/Bookmarks';
+import PasswordChecker from './pages/PasswordChecker';
+import DomainInfo from './pages/DomainInfo';
 
 export default function App() {
   return (
@@ -38,7 +44,14 @@ export default function App() {
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />      
+                <Route path="/register" element={<Register />} />
+                <Route path="/tools/url-expander" element={<UrlExpander />} />
+                <Route path="/tools/ip-lookup" element={<IpLookup />} />
+                <Route path="/tools/compare" element={<UrlComparison />} />
+                <Route path="/tools/threat-feed" element={<ThreatFeed />} />
+                <Route path="/tools/bookmarks" element={<Bookmarks />} />
+                <Route path="/tools/password-checker" element={<PasswordChecker />} />
+                <Route path="/tools/domain-info" element={<DomainInfo />} />
               </Routes>
             </main>
           </div>

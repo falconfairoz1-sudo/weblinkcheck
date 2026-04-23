@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
 import AdvancedAnalytics from '../components/AdvancedAnalytics';
+import ScanStreak from '../components/ScanStreak';
 import { getStatusColor, getStatusIcon, formatDate } from '../utils/helpers';
 import '../styles/dashboard.css';
 
@@ -66,30 +67,15 @@ export default function Dashboard() {
         <>
           {/* Stats Cards */}
           <div className="stats-grid">
-            <StatCard
-              icon="📊"
-              title="Total Scans"
-              value={stats?.total || 0}
-              color="#3b82f6"
-            />
-            <StatCard
-              icon="✅"
-              title="Safe URLs"
-              value={stats?.safe || 0}
-              color="#10b981"
-            />
-            <StatCard
-              icon="⚠️"
-              title="Suspicious"
-              value={stats?.suspicious || 0}
-              color="#f59e0b"
-            />
-            <StatCard
-              icon="❌"
-              title="Malicious"
-              value={stats?.malicious || 0}
-              color="#ef4444"
-            />
+            <StatCard icon="📊" title="Total Scans" value={stats?.total || 0} color="#3b82f6" />
+            <StatCard icon="✅" title="Safe URLs" value={stats?.safe || 0} color="#10b981" />
+            <StatCard icon="⚠️" title="Suspicious" value={stats?.suspicious || 0} color="#f59e0b" />
+            <StatCard icon="❌" title="Malicious" value={stats?.malicious || 0} color="#ef4444" />
+          </div>
+
+          {/* Scan Streak */}
+          <div className="dashboard-section">
+            <ScanStreak />
           </div>
 
           {/* Advanced Analytics */}

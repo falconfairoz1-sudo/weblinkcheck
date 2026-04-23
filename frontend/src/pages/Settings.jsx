@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import { useNotifications } from '../context/ScanContext';
 import api from '../utils/api';
 import '../styles/settings.css';
 
 export default function Settings() {
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
-  const { addNotification } = useNotifications();
+  const addNotification = (msg, type) => window.showNotification?.(msg, type);
   const [loading, setLoading] = useState(false);
   const [preferences, setPreferences] = useState({
     notifications: true,

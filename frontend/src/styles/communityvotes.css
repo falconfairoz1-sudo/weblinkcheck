@@ -1,0 +1,22 @@
+.community-votes { background: var(--bg-input); border: 1px solid var(--border-primary); border-radius: 12px; padding: 1.25rem; margin-top: 1rem; }
+.votes-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+.votes-icon { font-size: 1.2rem; }
+.votes-header h3 { margin: 0; font-size: 0.95rem; font-weight: 700; flex: 1; }
+.votes-total { font-size: 0.8rem; color: var(--text-secondary); }
+.votes-bar { height: 8px; border-radius: 4px; overflow: hidden; display: flex; margin-bottom: 0.5rem; background: var(--border-primary); }
+.votes-bar-safe { background: #10b981; transition: width 0.5s ease; }
+.votes-bar-unsafe { background: #ef4444; transition: width 0.5s ease; }
+.votes-labels { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+.votes-label-safe { font-size: 0.8rem; font-weight: 600; color: #10b981; }
+.votes-label-unsafe { font-size: 0.8rem; font-weight: 600; color: #ef4444; }
+.votes-prompt { font-size: 0.875rem; color: var(--text-secondary); margin: 0 0 0.75rem; text-align: center; }
+.vote-buttons { display: flex; gap: 0.75rem; }
+.vote-btn { flex: 1; border: none; border-radius: 8px; padding: 0.6rem 1rem; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.vote-safe { background: rgba(16,185,129,0.15); color: #10b981; }
+.vote-safe:hover:not(:disabled) { background: #10b981; color: #fff; }
+.vote-unsafe { background: rgba(239,68,68,0.15); color: #ef4444; }
+.vote-unsafe:hover:not(:disabled) { background: #ef4444; color: #fff; }
+.vote-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.votes-thankyou { text-align: center; font-size: 0.875rem; color: var(--text-secondary); padding: 0.5rem; }
+.votes-thankyou span { font-size: 1.5rem; display: block; margin-bottom: 0.25rem; }
+.votes-thankyou strong { color: var(--text-primary); }

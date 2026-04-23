@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getStatusColor, getStatusIcon, getStatusLabel, getRiskColor, getSeverityColor, formatDate, truncateUrl } from '../utils/helpers';
 import RiskGauge from './RiskGauge';
+import CommunityVotes from './CommunityVotes';
 import '../styles/resultcard.css';
 
 export default function ResultCard({ result }) {
@@ -216,6 +217,9 @@ export default function ResultCard({ result }) {
           </div>
         )}
       </div>
+
+      {/* Community Votes */}
+      {scanId && <CommunityVotes scanId={scanId} />}
     </div>
   );
 }

@@ -1,0 +1,35 @@
+.threatfeed-page { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem; }
+.threatfeed-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+.threatfeed-icon { font-size: 2.5rem; display: block; margin-bottom: 0.25rem; }
+.threatfeed-header h1 { font-size: 2rem; font-weight: 700; margin: 0 0 0.25rem; }
+.threatfeed-header p { color: var(--text-secondary); margin: 0; }
+.feed-controls { display: flex; gap: 0.5rem; align-items: center; }
+.refresh-btn { background: var(--bg-input); border: 1px solid var(--border-primary); border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.875rem; cursor: pointer; color: var(--text-primary); transition: all 0.2s; }
+.refresh-btn:hover { border-color: var(--text-accent); color: var(--text-accent); }
+.refresh-btn.active { background: var(--gradient-primary); color: #fff; border-color: transparent; }
+.live-indicator { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 700; color: #ef4444; margin-bottom: 1rem; }
+.live-dot { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; animation: livepulse 1s infinite; }
+@keyframes livepulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+.feed-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+.feed-section { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 16px; padding: 1.5rem; }
+.feed-section h2 { margin: 0 0 1rem; font-size: 1.1rem; font-weight: 700; }
+.feed-loading { display: flex; flex-direction: column; gap: 0.75rem; }
+.feed-skeleton { height: 60px; background: var(--bg-input); border-radius: 8px; animation: feedshimmer 1.5s infinite; }
+@keyframes feedshimmer { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+.feed-empty { text-align: center; padding: 2rem; color: var(--text-secondary); }
+.feed-empty span { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+.feed-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.feed-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--bg-input); border-radius: 10px; border: 1px solid var(--border-primary); }
+.feed-item.threat { border-left: 3px solid #ef4444; }
+.feed-item-left { display: flex; align-items: center; gap: 0.75rem; }
+.feed-status-icon { font-size: 1.2rem; }
+.feed-domain { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
+.feed-warning { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.1rem; }
+.feed-item-right { text-align: right; }
+.feed-score { font-size: 0.875rem; font-weight: 700; display: block; }
+.feed-time { font-size: 0.75rem; color: var(--text-secondary); }
+.feed-cta { text-align: center; background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 16px; padding: 2rem; }
+.feed-cta p { color: var(--text-secondary); margin: 0 0 1rem; }
+.cta-btn { background: var(--gradient-primary); color: #fff; text-decoration: none; border-radius: 10px; padding: 0.75rem 2rem; font-weight: 600; display: inline-block; transition: opacity 0.2s; }
+.cta-btn:hover { opacity: 0.9; }
+@media (max-width: 640px) { .feed-layout { grid-template-columns: 1fr; } .threatfeed-header { flex-direction: column; } }

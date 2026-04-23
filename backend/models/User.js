@@ -31,7 +31,12 @@ const userSchema = new mongoose.Schema(
     },
     totalScans: { type: Number, default: 0 },
     lastLogin: Date,
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
+    bookmarks: [{
+      url: { type: String, required: true },
+      label: { type: String, default: '' },
+      addedAt: { type: Date, default: Date.now }
+    }]
   },
   { timestamps: true }
 );

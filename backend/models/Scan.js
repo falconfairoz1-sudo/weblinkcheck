@@ -76,6 +76,10 @@ const scanSchema = new mongoose.Schema(
       explanation: [String],
       confidence: { type: String, enum: ['low', 'medium', 'high'] }
     },
+    communityVotes: {
+      safe: { type: Number, default: 0 },
+      unsafe: { type: Number, default: 0 }
+    },
     // User association (optional)
     userId: {
       type: mongoose.Schema.Types.ObjectId,
