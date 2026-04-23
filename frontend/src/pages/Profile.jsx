@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../context/ScanContext';
 import api from '../utils/api';
 import '../styles/profile.css';
@@ -57,12 +56,6 @@ export default function Profile() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-    addNotification('Logged out successfully', 'success');
-  };
-
   if (!user) {
     return (
       <div className="profile-page">
@@ -78,25 +71,19 @@ export default function Profile() {
   return (
     <div className="profile-page">
       <div className="profile-container">
-        {/* Header */}
         <div className="profile-header">
           <h1>👤 My Profile</h1>
-          <p>Manage your account settings and preferences</p>
         </div>
 
-        {/* Profile Card */}
         <div className="profile-card">
-          {/* Avatar Section */}
           <div className="avatar-section">
             <div className="avatar-large">👤</div>
             <div className="avatar-info">
               <h2>{user.username}</h2>
               <p className="user-email">{user.email}</p>
-              <p className="member-since">Member since {new Date(user.createdAt || Date.now()).toLocaleDateString()}</p>
             </div>
           </div>
 
-          {/* Profile Info */}
           {!isEditing ? (
             <div className="profile-info">
               <div className="info-group">
@@ -106,10 +93,6 @@ export default function Profile() {
               <div className="info-group">
                 <label>Email</label>
                 <p>{user.email}</p>
-              </div>
-              <div className="info-group">
-                <label>Account Status</label>
-                <p className="status-active">✅ Active</p>
               </div>
               <button className="btn-edit" onClick={() => setIsEditing(true)}>
                 ✏️ Edit Profile
@@ -207,51 +190,6 @@ export default function Profile() {
               </div>
             </form>
           )}
-        </div>
-
-        {/* Account Actions */}
-        <div className="account-actions">
-          <h3>Account Actions</h3>
-          <div className="actions-grid">
-            <button className="action-btn logout-btn" onClick={handleLogout}>
-              🚪 Logout
-            </button>
-            <button className="action-btn delete-btn" onClick={() => {
-              if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                addNotification('Account deletion feature coming soon', 'info');
-              }
-            }}>
-              🗑️ Delete Account
-            </button>
-          </div>
-        </div>
-
-        {/* Security Info */}
-        <div className="security-info">
-          <h3>🔒 Security Information</h3>
-          <div className="security-items">
-            <div className="security-item">
-              <span className="security-icon">✅</span>
-              <div className="security-text">
-                <p className="security-title">Password Protected</p>
-                <p className="security-desc">Your account is secured with a password</p>
-              </div>
-            </div>
-            <div className="security-item">
-              <span className="security-icon">✅</span>
-              <div className="security-text">
-                <p className="security-title">Secure Connection</p>
-                <p className="security-desc">All data is encrypted in transit</p>
-              </div>
-            </div>
-            <div className="security-item">
-              <span className="security-icon">✅</span>
-              <div className="security-text">
-                <p className="security-title">Privacy Protected</p>
-                <p className="security-desc">Your data is never shared with third parties</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

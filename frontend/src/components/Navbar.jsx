@@ -84,7 +84,10 @@ export default function Navbar() {
           <Link to="/history" className="mobile-link" onClick={() => setMenuOpen(false)}>History</Link>
           <Link to="/scanner-guide" className="mobile-link" onClick={() => setMenuOpen(false)}>📚 Guide</Link>
           {user && (
-            <Link to="/profile" className="mobile-link" onClick={() => setMenuOpen(false)}>👤 Profile</Link>
+            <>
+              <Link to="/profile" className="mobile-link" onClick={() => setMenuOpen(false)}>👤 Profile</Link>
+              <Link to="/settings" className="mobile-link" onClick={() => setMenuOpen(false)}>⚙️ Settings</Link>
+            </>
           )}
           {!user && (
             <>
