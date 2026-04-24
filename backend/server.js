@@ -29,7 +29,12 @@ app.use(helmet({
 
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? [process.env.FRONTEND_URL, 'https://weblinkcheck.vercel.app']
+    ? [
+        'https://www.linkguardscure.xyz',
+        'https://linkguardscure.xyz',
+        'https://weblinkcheck.vercel.app',
+        process.env.FRONTEND_URL
+      ].filter(Boolean)
     : ['http://localhost:5173', 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
