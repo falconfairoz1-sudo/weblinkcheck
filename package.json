@@ -29,16 +29,6 @@
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-username/linkguard-ai-link-safety-checker.git"
-  },
-  "bugs": {
-    "url": "https://github.com/your-username/linkguard-ai-link-safety-checker/issues"
-  },
-  "homepage": "https://github.com/your-username/linkguard-ai-link-safety-checker#readme",
-  "dependencies": {
-    "@vercel/analytics": "^2.0.1"
   }
+}
 }
