@@ -37,5 +37,8 @@
   "bugs": {
     "url": "https://github.com/your-username/linkguard-ai-link-safety-checker/issues"
   },
-  "homepage": "https://github.com/your-username/linkguard-ai-link-safety-checker#readme"
+  "homepage": "https://github.com/your-username/linkguard-ai-link-safety-checker#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
 }

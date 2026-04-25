@@ -30,6 +30,7 @@ import PingTool from './pages/PingTool';
 import LeakedPasswordCheck from './pages/LeakedPasswordCheck';
 import PhishingQuiz from './pages/PhishingQuiz';
 import BulkDomainReputation from './pages/BulkDomainReputation';
+import { Analytics } from "@vercel/analytics/next"
 
 export default function App() {
   return (
@@ -68,9 +69,11 @@ export default function App() {
                 <Route path="/tools/bulk-reputation" element={<BulkDomainReputation />} />
               </Routes>
             </main>
+            <Analytics/>
           </div>
         </ScanProvider>
       </AuthProvider>
     </ThemeProvider>
+    
   );
 }
