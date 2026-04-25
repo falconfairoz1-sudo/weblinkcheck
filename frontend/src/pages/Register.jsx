@@ -12,8 +12,14 @@ export default function Register() {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const { register } = useAuth();
+  const { register, user } = useAuth();
   const navigate = useNavigate();
+
+  // Already logged in — redirect
+  if (user) {
+    navigate(user.role === 'admin' ? '/admin' : '/dashboard', { replace: true });
+    return null;
+  }
 
   const validateForm = () => {
     const newErrors = {};
@@ -58,8 +64,9 @@ export default function Register() {
     setErrors({});
 
     try {
-      await register(formData.username, formData.email, formData.password);
-      navigate('/dashboard');
+      const userData = await register(formData.username, formData.email, formData.password);
+      // Redirect admin to admin panel, regular users to dashboard
+      navigate(userData.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err) {
       const errorMsg = err.response?.data?.error || 'Registration failed. Please try again.';
       setErrors({ general: errorMsg });

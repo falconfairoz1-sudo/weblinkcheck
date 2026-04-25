@@ -7,8 +7,14 @@ export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
+
+  // Already logged in — redirect
+  if (user) {
+    navigate(user.role === 'admin' ? '/admin' : '/dashboard', { replace: true });
+    return null;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,8 +22,9 @@ export default function Login() {
     setError('');
 
     try {
-      await login(formData.email, formData.password);
-      navigate('/dashboard');
+      const userData = await login(formData.email, formData.password);
+      // Redirect admin to admin panel, regular users to dashboard
+      navigate(userData.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed. Please try again.');
     } finally {

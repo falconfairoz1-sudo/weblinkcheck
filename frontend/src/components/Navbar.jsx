@@ -145,12 +145,23 @@ export default function Navbar() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 title="User Menu"
               >
-                <span className="user-avatar">👤</span>
-                <span className="user-name">{user.username}</span>
+                <span className="user-avatar">{user.role === 'admin' ? '🛡️' : '👤'}</span>
+                <span className="user-name">
+                  {user.username}
+                  {user.role === 'admin' && <span className="admin-badge">Admin</span>}
+                </span>
                 <span className="dropdown-arrow">{dropdownOpen ? '▲' : '▼'}</span>
               </button>
               {dropdownOpen && (
                 <div className="user-dropdown">
+                  {user.role === 'admin' && (
+                    <>
+                      <Link to="/admin" className="dropdown-item admin-item" onClick={() => setDropdownOpen(false)}>
+                        <span className="dropdown-icon">🛡️</span>Admin Panel
+                      </Link>
+                      <div className="dropdown-divider"></div>
+                    </>
+                  )}
                   <Link to="/profile" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
                     <span className="dropdown-icon">👤</span>Profile
                   </Link>
@@ -218,6 +229,9 @@ export default function Navbar() {
             <>
               <Link to="/profile" className="mobile-link" onClick={() => setMenuOpen(false)}>👤 Profile</Link>
               <Link to="/settings" className="mobile-link" onClick={() => setMenuOpen(false)}>⚙️ Settings</Link>
+              {user.role === 'admin' && (
+                <Link to="/admin" className="mobile-link mobile-admin-link" onClick={() => setMenuOpen(false)}>🛡️ Admin Panel</Link>
+              )}
             </>
           )}
           {!user && (

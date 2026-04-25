@@ -15,6 +15,7 @@ const monitorRoutes = require('./routes/monitorRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const toolsRoutes = require('./routes/toolsRoutes');
 const advancedRoutes = require('./routes/advancedRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 const { startMonitorCron } = require('./jobs/monitorCron');
 
@@ -73,6 +74,7 @@ app.use('/api/monitor', monitorRoutes);
 app.use('/api/report', reportRoutes);
 app.use('/api/tools', toolsRoutes);
 app.use('/api/advanced', advancedRoutes);
+app.use('/api/admin', adminRoutes);
 
 
 

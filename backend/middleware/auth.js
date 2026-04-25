@@ -61,3 +61,15 @@ async function optionalAuth(req, res, next) {
 }
 
 module.exports = { protect, optionalAuth };
+
+/**
+ * Admin only — use after protect
+ */
+function adminOnly(req, res, next) {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin access required.' });
+  }
+  next();
+}
+
+module.exports = { protect, optionalAuth, adminOnly };

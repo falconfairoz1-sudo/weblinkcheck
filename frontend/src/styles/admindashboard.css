@@ -1,0 +1,45 @@
+.admin-page{max-width:1200px;margin:0 auto;padding:2rem 1rem}
+.admin-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.admin-header h1{font-size:2rem;font-weight:800;margin:0 0 .25rem}
+.admin-header p{color:var(--text-secondary);margin:0}
+.admin-role-badge{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:.35rem .9rem;border-radius:20px}
+.admin-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;border-bottom:1px solid var(--border-primary);padding-bottom:0}
+.admin-tab{background:none;border:none;border-bottom:2px solid transparent;padding:.6rem 1.25rem;font-size:.9rem;font-weight:600;cursor:pointer;color:var(--text-secondary);transition:all .15s;margin-bottom:-1px;font-family:inherit}
+.admin-tab:hover{color:var(--text-primary)}
+.admin-tab.active{color:var(--text-accent);border-bottom-color:var(--text-accent)}
+.admin-loading{text-align:center;padding:3rem;display:flex;flex-direction:column;align-items:center;gap:1rem;color:var(--text-secondary)}
+.admin-stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+.admin-stat-card{background:var(--bg-card);border:1px solid var(--border-primary);border-radius:12px;padding:1.25rem;text-align:center;border-top:3px solid var(--c)}
+.asc-icon{font-size:1.75rem;display:block;margin-bottom:.5rem}
+.asc-val{font-size:1.75rem;font-weight:800;color:var(--c)}
+.asc-label{font-size:.75rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-top:.25rem}
+.admin-recent h2{font-size:1.1rem;font-weight:700;margin:0 0 1rem}
+.admin-table-wrap{overflow-x:auto;background:var(--bg-card);border:1px solid var(--border-primary);border-radius:12px}
+.admin-table{width:100%;border-collapse:collapse;font-size:.875rem}
+.admin-table thead{background:var(--bg-input)}
+.admin-table th{padding:.75rem 1rem;text-align:left;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);white-space:nowrap}
+.admin-table td{padding:.7rem 1rem;border-top:1px solid var(--border-primary);color:var(--text-primary);vertical-align:middle}
+.admin-table tbody tr:hover{background:var(--bg-hover)}
+.admin-table tbody tr.row-banned{opacity:.6}
+.role-badge{padding:.2rem .6rem;border-radius:20px;font-size:.7rem;font-weight:700;text-transform:uppercase}
+.role-admin{background:rgba(245,158,11,.15);color:#f59e0b}
+.role-user{background:rgba(79,158,255,.12);color:var(--text-accent)}
+.status-dot{font-size:.8rem;font-weight:600}
+.status-dot.active{color:#10b981}
+.status-dot.banned{color:#ef4444}
+.you-badge{background:rgba(79,158,255,.15);color:var(--text-accent);font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:4px;margin-left:.4rem}
+.scan-status-badge{padding:.2rem .6rem;border-radius:20px;font-size:.75rem;font-weight:700;text-transform:uppercase}
+.status-safe{background:rgba(16,185,129,.15);color:#10b981}
+.status-suspicious{background:rgba(245,158,11,.15);color:#f59e0b}
+.status-malicious{background:rgba(239,68,68,.15);color:#ef4444}
+.status-error{background:rgba(107,114,128,.15);color:#6b7280}
+.url-cell{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace;font-size:.8rem}
+.action-btns{display:flex;gap:.4rem;flex-wrap:wrap}
+.act-btn{border:none;border-radius:6px;padding:.3rem .65rem;font-size:.75rem;font-weight:600;cursor:pointer;transition:opacity .15s;text-decoration:none;display:inline-flex;align-items:center;gap:.25rem;font-family:inherit}
+.act-btn:hover{opacity:.8}
+.act-btn.ban{background:rgba(239,68,68,.12);color:#ef4444}
+.act-btn.unban{background:rgba(16,185,129,.12);color:#10b981}
+.act-btn.promote{background:rgba(245,158,11,.12);color:#f59e0b}
+.act-btn.view{background:rgba(79,158,255,.12);color:var(--text-accent)}
+.act-btn.delete{background:rgba(239,68,68,.12);color:#ef4444}
+@media(max-width:640px){.admin-stats-grid{grid-template-columns:repeat(2,1fr)}}

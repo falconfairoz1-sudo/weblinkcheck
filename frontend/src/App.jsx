@@ -30,6 +30,7 @@ import PingTool from './pages/PingTool';
 import LeakedPasswordCheck from './pages/LeakedPasswordCheck';
 import PhishingQuiz from './pages/PhishingQuiz';
 import BulkDomainReputation from './pages/BulkDomainReputation';
+import AdminDashboard from './pages/AdminDashboard';
 
 
 export default function App() {
@@ -67,6 +68,7 @@ export default function App() {
                 <Route path="/tools/leaked-password" element={<LeakedPasswordCheck />} />
                 <Route path="/tools/phishing-quiz" element={<PhishingQuiz />} />
                 <Route path="/tools/bulk-reputation" element={<BulkDomainReputation />} />
+                <Route path="/admin" element={<AdminDashboard />} />
               </Routes>
             </main>
           </div>
