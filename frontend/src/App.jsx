@@ -30,7 +30,7 @@ import PingTool from './pages/PingTool';
 import LeakedPasswordCheck from './pages/LeakedPasswordCheck';
 import PhishingQuiz from './pages/PhishingQuiz';
 import BulkDomainReputation from './pages/BulkDomainReputation';
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/react"
 
 export default function App() {
   return (
